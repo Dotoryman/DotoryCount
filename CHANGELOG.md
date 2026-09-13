@@ -8,7 +8,7 @@ All notable changes to DotoryCount are recorded in this file.
 
 - Production app icon featuring a glass jar filled with acorns.
 - Anniversary deletion with a confirmation step.
-- Automated unit and core UI tests for pull requests and `main`.
+- Automated builds and unit tests for pull requests and `main`.
 - Unit coverage for milestone selection and leap-year jar capacity.
 - UI coverage for creating and deleting an anniversary.
 

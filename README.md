@@ -17,7 +17,7 @@
 - 기념일 삭제 및 확인 절차
 - 저장 실패 안내와 입력 길이 검증
 - 실제 iPhone 설치 및 실행 검증
-- GitHub Actions 자동 빌드 및 핵심 테스트
+- GitHub Actions 자동 빌드 및 단위 테스트
 
 자세한 변경 사항은 [CHANGELOG.md](CHANGELOG.md)에서 확인할 수 있습니다.
 
