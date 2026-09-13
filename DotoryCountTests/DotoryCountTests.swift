@@ -52,4 +52,24 @@ struct DotoryCountTests {
         #expect(progress.counterText == "D-10")
         #expect(progress.nextMilestone.title == "시작일")
     }
+
+    @Test("100일보다 주년이 가까우면 주년을 안내한다")
+    func anniversaryBeforeDayMilestone() throws {
+        let start = try #require(calendar.date(from: DateComponents(year: 2025, month: 9, day: 20)))
+        let current = try #require(calendar.date(from: DateComponents(year: 2026, month: 9, day: 13)))
+        let progress = AnniversaryCalculator.progress(from: start, to: current, calendar: calendar)
+
+        #expect(progress.nextMilestone.title == "1주년")
+        #expect(progress.nextMilestone.daysRemaining == 7)
+    }
+
+    @Test("윤년이 포함된 병의 용량은 366일이다")
+    func leapYearJarCapacity() throws {
+        let start = try #require(calendar.date(from: DateComponents(year: 2023, month: 9, day: 13)))
+        let current = try #require(calendar.date(from: DateComponents(year: 2024, month: 2, day: 29)))
+        let progress = AnniversaryCalculator.progress(from: start, to: current, calendar: calendar)
+
+        #expect(progress.currentJarCapacity == 366)
+        #expect(progress.acornsInCurrentJar == 169)
+    }
 }

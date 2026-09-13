@@ -1,13 +1,19 @@
 import SwiftData
 import SwiftUI
+import OSLog
 
 struct AnniversaryEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
 
     private let anniversary: Anniversary?
+    private let logger = Logger(subsystem: "com.dotoryman.dotorycount", category: "AnniversaryEditor")
+    private let maximumTitleLength = 30
+
     @State private var title: String
     @State private var startDate: Date
+    @State private var presentedAlert: EditorAlert?
+    @FocusState private var isTitleFocused: Bool
 
     init(anniversary: Anniversary? = nil) {
         self.anniversary = anniversary
@@ -18,13 +24,25 @@ struct AnniversaryEditorView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("기념일") {
+                Section {
                     TextField("이름", text: $title, prompt: Text("우리의 시작"))
                         .textInputAutocapitalization(.sentences)
+                        .submitLabel(.done)
+                        .focused($isTitleFocused)
                         .accessibilityIdentifier("anniversary-title-field")
 
                     DatePicker("기준일", selection: $startDate, displayedComponents: .date)
                         .accessibilityIdentifier("anniversary-date-picker")
+                } header: {
+                    Text("기념일")
+                } footer: {
+                    HStack {
+                        Text("이름은 30자까지 입력할 수 있어요.")
+                        Spacer()
+                        Text("\(title.count)/\(maximumTitleLength)")
+                            .monospacedDigit()
+                            .foregroundStyle(title.count > maximumTitleLength ? .red : AppTheme.secondaryText)
+                    }
                 }
 
                 Section {
@@ -32,9 +50,20 @@ struct AnniversaryEditorView: View {
                         .font(.footnote)
                         .foregroundStyle(AppTheme.secondaryText)
                 }
+
+                if anniversary != nil {
+                    Section {
+                        Button("기념일 삭제", role: .destructive) {
+                            presentedAlert = .deleteConfirmation
+                        }
+                        .accessibilityIdentifier("delete-anniversary-button")
+                        .accessibilityHint("저장된 기념일을 삭제하기 전에 확인합니다")
+                    }
+                }
             }
             .scrollContentBackground(.hidden)
             .background(AppTheme.background)
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle(anniversary == nil ? "기념일 만들기" : "기념일 수정")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -43,8 +72,30 @@ struct AnniversaryEditorView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("저장", action: save)
-                        .disabled(trimmedTitle.isEmpty)
+                        .disabled(!isTitleValid)
                         .accessibilityIdentifier("save-anniversary-button")
+                }
+            }
+            .task {
+                if anniversary == nil {
+                    isTitleFocused = true
+                }
+            }
+            .alert(item: $presentedAlert) { alert in
+                switch alert {
+                case .deleteConfirmation:
+                    return Alert(
+                        title: Text("기념일을 삭제할까요?"),
+                        message: Text("쌓인 도토리 기록도 함께 사라집니다."),
+                        primaryButton: .destructive(Text("삭제"), action: deleteAnniversary),
+                        secondaryButton: .cancel()
+                    )
+                case .persistenceFailure:
+                    return Alert(
+                        title: Text("변경사항을 저장할 수 없어요"),
+                        message: Text("잠시 후 다시 시도해 주세요."),
+                        dismissButton: .default(Text("확인"))
+                    )
                 }
             }
         }
@@ -54,19 +105,53 @@ struct AnniversaryEditorView: View {
         title.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    private func save() {
-        if let anniversary {
-            anniversary.title = trimmedTitle
-            anniversary.startDate = startDate
-        } else {
-            modelContext.insert(Anniversary(title: trimmedTitle, startDate: startDate))
-        }
+    private var isTitleValid: Bool {
+        !trimmedTitle.isEmpty && title.count <= maximumTitleLength
+    }
 
+    private func save() {
         do {
+            if let anniversary {
+                anniversary.title = trimmedTitle
+                anniversary.startDate = startDate
+            } else {
+                modelContext.insert(Anniversary(title: trimmedTitle, startDate: startDate))
+            }
+
             try modelContext.save()
             dismiss()
         } catch {
-            assertionFailure("Failed to save anniversary: \(error)")
+            modelContext.rollback()
+            logger.error("Failed to save anniversary: \(error.localizedDescription, privacy: .public)")
+            presentedAlert = .persistenceFailure
+        }
+    }
+
+    private func deleteAnniversary() {
+        guard let anniversary else { return }
+
+        do {
+            modelContext.delete(anniversary)
+            try modelContext.save()
+            dismiss()
+        } catch {
+            modelContext.rollback()
+            logger.error("Failed to delete anniversary: \(error.localizedDescription, privacy: .public)")
+            presentedAlert = .persistenceFailure
+        }
+    }
+}
+
+private enum EditorAlert: Identifiable {
+    case deleteConfirmation
+    case persistenceFailure
+
+    var id: String {
+        switch self {
+        case .deleteConfirmation:
+            return "delete-confirmation"
+        case .persistenceFailure:
+            return "persistence-failure"
         }
     }
 }
