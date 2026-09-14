@@ -21,6 +21,8 @@
 
 자세한 변경 사항은 [CHANGELOG.md](CHANGELOG.md)에서 확인할 수 있습니다.
 
+1.0 출시까지의 계획은 [ROADMAP.md](ROADMAP.md)에서 확인할 수 있습니다.
+
 ## Development
 
 - Xcode 26.6+
