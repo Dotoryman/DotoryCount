@@ -72,4 +72,34 @@ struct DotoryCountTests {
         #expect(progress.currentJarCapacity == 366)
         #expect(progress.acornsInCurrentJar == 169)
     }
+
+    @Test("도토리 배치는 개수가 늘어도 기존 위치를 유지한다")
+    func acornLayoutIsStable() {
+        let initial = AcornJarLayout.placements(count: 120)
+        let expanded = AcornJarLayout.placements(count: 121)
+
+        #expect(Array(expanded.prefix(initial.count)) == initial)
+    }
+
+    @Test("윤년의 모든 도토리가 병 안 안전 영역에 배치된다")
+    func leapYearAcornsStayInsideJar() {
+        let placements = AcornJarLayout.placements(count: 366)
+
+        #expect(placements.count == 366)
+        #expect(placements.allSatisfy { placement in
+            placement.x - placement.width / 2 >= 0.10
+                && placement.x + placement.width / 2 <= 0.90
+                && placement.y - placement.height / 2 >= 0.20
+                && placement.y + placement.height / 2 <= 0.94
+        })
+    }
+
+    @Test("잘못된 도토리 수는 안전한 표시 범위로 제한한다")
+    func acornLayoutClampsCount() {
+        #expect(AcornJarLayout.placements(count: -1).isEmpty)
+        #expect(
+            AcornJarLayout.placements(count: 1_000).count
+                == AcornJarLayout.maximumVisibleCount
+        )
+    }
 }

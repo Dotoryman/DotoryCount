@@ -91,6 +91,8 @@ private struct AnniversaryDashboard: View {
     let anniversary: Anniversary
     let editAction: () -> Void
 
+    @State private var latestAcornPresentation: LatestAcornPresentation = .hidden
+
     private var progress: AnniversaryProgress {
         AnniversaryCalculator.progress(from: anniversary.startDate)
     }
@@ -131,7 +133,8 @@ private struct AnniversaryDashboard: View {
         VStack(spacing: 16) {
             AcornJarView(
                 acornCount: progress.acornsInCurrentJar,
-                capacity: progress.currentJarCapacity
+                capacity: progress.currentJarCapacity,
+                latestAcornPresentation: latestAcornPresentation
             )
             .frame(width: 220, height: 280)
 
@@ -147,6 +150,9 @@ private struct AnniversaryDashboard: View {
         .frame(maxWidth: .infinity)
         .padding(24)
         .background(AppTheme.surface, in: RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius))
+        .task(id: progress.elapsedDays) {
+            await prepareDailyAcornAnimation()
+        }
     }
 
     private var milestoneCard: some View {
@@ -173,5 +179,33 @@ private struct AnniversaryDashboard: View {
         }
         .padding(18)
         .background(AppTheme.surface, in: RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius))
+    }
+
+    @MainActor
+    private func prepareDailyAcornAnimation() async {
+        guard progress.elapsedDays > 0, progress.acornsInCurrentJar > 0 else {
+            latestAcornPresentation = .static
+            return
+        }
+
+        let defaultsKey = "lastAnimatedElapsedDay.\(anniversary.id.uuidString)"
+        let lastAnimatedDay = UserDefaults.standard.object(forKey: defaultsKey) as? Int
+        let forcesAnimation = ProcessInfo.processInfo.arguments.contains("--replay-acorn-animation")
+
+        guard forcesAnimation || lastAnimatedDay != progress.elapsedDays else {
+            latestAcornPresentation = .static
+            return
+        }
+
+        try? await Task.sleep(for: .milliseconds(450))
+        guard !Task.isCancelled else { return }
+
+        if !forcesAnimation {
+            UserDefaults.standard.set(progress.elapsedDays, forKey: defaultsKey)
+        }
+        latestAcornPresentation = .falling
+
+        try? await Task.sleep(for: .seconds(1.2))
+        latestAcornPresentation = .static
     }
 }

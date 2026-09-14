@@ -13,7 +13,8 @@ struct DotoryCountApp: App {
     private let modelContainer: ModelContainer
 
     init() {
-        let isUITesting = ProcessInfo.processInfo.arguments.contains("--ui-testing")
+        let arguments = ProcessInfo.processInfo.arguments
+        let isUITesting = arguments.contains("--ui-testing")
         let configuration = ModelConfiguration(isStoredInMemoryOnly: isUITesting)
 
         do {
@@ -21,6 +22,14 @@ struct DotoryCountApp: App {
                 for: Anniversary.self,
                 configurations: configuration
             )
+
+            if isUITesting, arguments.contains("--ui-testing-seeded-anniversary") {
+                let startDate = Calendar.current.date(byAdding: .day, value: -22, to: .now) ?? .now
+                modelContainer.mainContext.insert(
+                    Anniversary(title: "우리의 시작", startDate: startDate)
+                )
+                try modelContainer.mainContext.save()
+            }
         } catch {
             fatalError("Unable to create local data store: \(error)")
         }

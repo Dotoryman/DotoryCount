@@ -32,9 +32,18 @@ final class DotoryCountUITests: XCTestCase {
     }
 
     @MainActor
-    private func launchApp() -> XCUIApplication {
+    func testSeededAnniversaryShowsAcornJar() throws {
+        let app = launchApp(additionalArguments: ["--ui-testing-seeded-anniversary"])
+
+        let jar = app.otherElements["acorn-jar"]
+        XCTAssertTrue(jar.waitForExistence(timeout: 3))
+        XCTAssertTrue((jar.value as? String)?.contains("도토리 22개") == true)
+    }
+
+    @MainActor
+    private func launchApp(additionalArguments: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-testing"]
+        app.launchArguments = ["--ui-testing"] + additionalArguments
         app.launch()
         return app
     }
