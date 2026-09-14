@@ -2,6 +2,22 @@
 
 All notable changes to DotoryCount are recorded in this file.
 
+## [0.2.0] - 2026-09-14
+
+### Added
+
+- A daily acorn drop animation that plays once when a new day is first viewed.
+- Stable, deterministic acorn placement for up to 366 days.
+- Dedicated light and dark appearance colors.
+- Layout tests and UI coverage for a populated acorn jar.
+- Reduced Motion fallback for the daily animation.
+
+### Changed
+
+- Replaced the flat oval grid with individually shaped, shaded, and rotated acorns.
+- Refined the glass jar with adaptive highlights, gradients, and depth.
+- Bumped the app to version 0.2.0 (build 3).
+
 ## [0.1.1] - 2026-09-13
 
 ### Added
