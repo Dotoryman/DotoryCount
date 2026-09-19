@@ -3,95 +3,238 @@ import SwiftUI
 struct AcornJarView: View {
     let acornCount: Int
     let capacity: Int
+    var milestones: [JarMilestone] = []
     var latestAcornPresentation: LatestAcornPresentation = .static
+    var celebratingMilestone: AnniversaryMilestone?
+    var onMilestoneTapped: (AnniversaryMilestone) -> Void = { _ in }
 
     var body: some View {
         GeometryReader { proxy in
-            let placements = AcornJarLayout.placements(count: acornCount)
+            let placements = AcornJarLayout.placements(dayCount: acornCount)
             let latestPlacement = placements.last?.resolved(in: proxy.size)
             let staticPlacements = latestAcornPresentation == .static
                 ? placements[...]
                 : placements.dropLast()
+            let visualMilestones = visualMilestones(for: placements)
+            let goldenIndexes = Set(visualMilestones.map(\.index))
 
             ZStack {
-                GlassJarShape()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                AppTheme.glass.opacity(0.10),
-                                AppTheme.glass.opacity(0.24),
-                                Color.white.opacity(0.10)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                jarInterior
 
                 Canvas { context, size in
-                    for placement in staticPlacements {
+                    let regularAcorn = context.resolve(Image("AcornSprite"))
+
+                    for (index, placement) in staticPlacements.enumerated() {
+                        guard !goldenIndexes.contains(index) else { continue }
                         AcornRenderer.draw(
+                            regularAcorn,
                             in: &context,
                             placement: placement.resolved(in: size)
                         )
                     }
                 }
 
+                milestoneButtons(visualMilestones, in: proxy.size)
+
                 if latestAcornPresentation == .falling, let latestPlacement {
-                    FallingAcornView(placement: latestPlacement)
+                    FallingAcornView(
+                        placement: latestPlacement,
+                        isGolden: goldenIndexes.contains(max(placements.count - 1, 0))
+                    )
                 }
 
-                jarHighlights
+                frontGlass
             }
             .clipShape(GlassJarShape())
-            .overlay {
-                GlassJarShape()
-                    .stroke(
-                        LinearGradient(
-                            colors: [Color.white, AppTheme.glass, AppTheme.glass.opacity(0.72)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
-                    )
-            }
-            .overlay(alignment: .top) {
-                jarRim
-            }
-            .shadow(color: AppTheme.accent.opacity(0.12), radius: 12, y: 8)
+            .overlay { glassEdges }
+            .overlay(alignment: .top) { jarRim }
+            .shadow(color: Color.black.opacity(0.13), radius: 18, y: 14)
+            .shadow(color: AppTheme.glass.opacity(0.22), radius: 6, y: 2)
         }
-        .accessibilityElement(children: .ignore)
+        .accessibilityElement(children: .contain)
         .accessibilityLabel("유리병")
-        .accessibilityValue("도토리 \(acornCount)개, 최대 \(capacity)개")
+        .accessibilityValue(accessibilityValue)
         .accessibilityIdentifier("acorn-jar")
     }
 
-    private var jarHighlights: some View {
+    private var accessibilityValue: String {
+        let goldenCount = milestones.count
+        let suffix = goldenCount > 0 ? ", 황금도토리 \(goldenCount)개" : ""
+        return "함께한 날 \(acornCount)일, 1년 \(capacity)일\(suffix)"
+    }
+
+    private var jarInterior: some View {
+        GlassJarShape()
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.30),
+                        AppTheme.glass.opacity(0.09),
+                        Color.white.opacity(0.05),
+                        AppTheme.glass.opacity(0.18)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .background(.ultraThinMaterial, in: GlassJarShape())
+    }
+
+    private var frontGlass: some View {
         GeometryReader { proxy in
-            Capsule()
-                .fill(Color.white.opacity(0.34))
-                .frame(width: proxy.size.width * 0.035, height: proxy.size.height * 0.50)
-                .blur(radius: 0.7)
-                .position(x: proxy.size.width * 0.19, y: proxy.size.height * 0.52)
+            ZStack {
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.white.opacity(0.68), Color.white.opacity(0.08)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: proxy.size.width * 0.045, height: proxy.size.height * 0.48)
+                    .blur(radius: 0.8)
+                    .position(x: proxy.size.width * 0.19, y: proxy.size.height * 0.53)
+
+                Capsule()
+                    .fill(Color.white.opacity(0.22))
+                    .frame(width: proxy.size.width * 0.022, height: proxy.size.height * 0.25)
+                    .blur(radius: 1.2)
+                    .position(x: proxy.size.width * 0.26, y: proxy.size.height * 0.43)
+
+                Ellipse()
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.78),
+                                AppTheme.glass.opacity(0.64),
+                                Color.white.opacity(0.20)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        lineWidth: 4
+                    )
+                    .frame(width: proxy.size.width * 0.76, height: proxy.size.height * 0.085)
+                    .position(x: proxy.size.width / 2, y: proxy.size.height * 0.91)
+
+                if celebratingMilestone != nil {
+                    RadialGradient(
+                        colors: [Color.yellow.opacity(0.20), Color.clear],
+                        center: .center,
+                        startRadius: 2,
+                        endRadius: proxy.size.width * 0.38
+                    )
+                    .blendMode(.screen)
+                    .transition(.opacity)
+                }
+            }
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
 
+    private var glassEdges: some View {
+        GlassJarShape()
+            .stroke(
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.94),
+                        AppTheme.glass.opacity(0.86),
+                        Color.white.opacity(0.38),
+                        AppTheme.glass.opacity(0.72)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round)
+            )
+            .overlay {
+                GlassJarShape()
+                    .inset(by: 5)
+                    .stroke(Color.white.opacity(0.22), lineWidth: 2)
+            }
+    }
+
     private var jarRim: some View {
         GeometryReader { proxy in
-            Capsule()
-                .stroke(
-                    LinearGradient(
-                        colors: [Color.white, AppTheme.glass, Color.white.opacity(0.75)],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ),
-                    lineWidth: 5
-                )
-                .frame(width: proxy.size.width * 0.51, height: proxy.size.height * 0.055)
-                .position(x: proxy.size.width / 2, y: 4)
+            ZStack {
+                Capsule()
+                    .fill(AppTheme.glass.opacity(0.16))
+                    .frame(width: proxy.size.width * 0.58, height: proxy.size.height * 0.075)
+
+                Capsule()
+                    .stroke(
+                        LinearGradient(
+                            colors: [Color.white, AppTheme.glass, Color.white.opacity(0.82)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        lineWidth: 5
+                    )
+                    .frame(width: proxy.size.width * 0.58, height: proxy.size.height * 0.075)
+
+                Capsule()
+                    .stroke(Color.white.opacity(0.72), lineWidth: 2)
+                    .frame(width: proxy.size.width * 0.50, height: proxy.size.height * 0.038)
+            }
+            .position(x: proxy.size.width / 2, y: 6)
         }
+        .allowsHitTesting(false)
         .accessibilityHidden(true)
+    }
+
+    @ViewBuilder
+    private func milestoneButtons(
+        _ visualMilestones: [VisualMilestone],
+        in size: CGSize
+    ) -> some View {
+        ForEach(visualMilestones) { item in
+            let placement = item.placement.resolved(in: size)
+
+            Button {
+                onMilestoneTapped(item.milestone)
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [Color.yellow.opacity(0.30), Color.yellow.opacity(0.06), Color.clear],
+                                center: .center,
+                                startRadius: 1,
+                                endRadius: max(placement.size.width, placement.size.height)
+                            )
+                        )
+                        .blendMode(.screen)
+
+                    Image("GoldenAcornSprite")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: placement.size.width, height: placement.size.height)
+                        .rotationEffect(placement.rotation)
+                        .shadow(color: Color.yellow.opacity(0.35), radius: 3, y: 1)
+                }
+                .frame(width: max(placement.size.width * 1.8, 44), height: max(placement.size.height * 1.4, 44))
+                .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .position(placement.center)
+            .accessibilityLabel("황금도토리 \(item.milestone.title)")
+            .accessibilityHint("기념일 내용을 확인합니다")
+        }
+    }
+
+    private func visualMilestones(for placements: [AcornPlacement]) -> [VisualMilestone] {
+        var usedIndexes = Set<Int>()
+
+        return milestones.compactMap { jarMilestone in
+            let index = AcornJarLayout.visualIndex(forDay: jarMilestone.dayInJar)
+            guard placements.indices.contains(index), usedIndexes.insert(index).inserted else { return nil }
+            return VisualMilestone(
+                index: index,
+                placement: placements[index],
+                milestone: jarMilestone.milestone
+            )
+        }
     }
 }
 
@@ -123,34 +266,74 @@ struct ResolvedAcornPlacement {
     let rotation: Angle
 }
 
+private struct VisualMilestone: Identifiable {
+    let index: Int
+    let placement: AcornPlacement
+    let milestone: AnniversaryMilestone
+
+    var id: Int { milestone.id }
+}
+
 enum AcornJarLayout {
-    private static let columns = 13
-    private static let rows = 29
-    private static let columnOrder = [6, 5, 7, 4, 8, 3, 9, 2, 10, 1, 11, 0, 12]
+    static let exactDayLimit = 14
+    static let daysPerVisualAcorn = 7
+
+    private static let columns = 8
+    private static let rows = 8
+    private static let columnOrder = [3, 4, 2, 5, 1, 6, 0, 7]
 
     static var maximumVisibleCount: Int {
         columns * rows
     }
 
-    static func placements(count: Int) -> [AcornPlacement] {
-        let visibleCount = min(max(count, 0), maximumVisibleCount)
-        let cellWidth = 0.72 / Double(columns)
-        let cellHeight = 0.66 / Double(rows)
+    static func displayedCount(for dayCount: Int) -> Int {
+        let safeCount = max(dayCount, 0)
+        guard safeCount > exactDayLimit else { return safeCount }
 
-        return (0..<visibleCount).map { index in
+        let groupedDays = safeCount - exactDayLimit
+        let weeklyAcorns = (groupedDays + daysPerVisualAcorn - 1) / daysPerVisualAcorn
+        return min(exactDayLimit + weeklyAcorns, maximumVisibleCount)
+    }
+
+    static func visualIndex(forDay day: Int) -> Int {
+        let safeDay = max(day, 1)
+        guard safeDay > exactDayLimit else { return safeDay - 1 }
+        return min(
+            exactDayLimit + (safeDay - exactDayLimit - 1) / daysPerVisualAcorn,
+            maximumVisibleCount - 1
+        )
+    }
+
+    static func addsVisualAcorn(onDay day: Int) -> Bool {
+        guard day > 0 else { return false }
+        guard day > exactDayLimit else { return true }
+        return (day - exactDayLimit - 1).isMultiple(of: daysPerVisualAcorn)
+    }
+
+    static func placements(dayCount: Int) -> [AcornPlacement] {
+        placements(visibleCount: displayedCount(for: dayCount))
+    }
+
+    static func placements(visibleCount: Int) -> [AcornPlacement] {
+        let count = min(max(visibleCount, 0), maximumVisibleCount)
+        let cellWidth = 0.74 / Double(columns)
+        let cellHeight = 0.59 / Double(rows)
+
+        return (0..<count).map { index in
             let row = index / columns
             let orderedColumn = columnOrder[index % columns]
             let stagger = row.isMultiple(of: 2) ? -cellWidth * 0.12 : cellWidth * 0.12
-            let jitterX = centeredNoise(index: index, salt: 17) * cellWidth * 0.15
+            let rowDrift = centeredNoise(index: row, salt: 149) * cellWidth * 0.20
+            let jitterX = centeredNoise(index: index, salt: 17) * cellWidth * 0.24
             let jitterY = centeredNoise(index: index, salt: 43) * cellHeight * 0.18
-            let scale = 0.92 + unitNoise(index: index, salt: 71) * 0.14
+            let scale = 0.84 + unitNoise(index: index, salt: 71) * 0.28
 
             return AcornPlacement(
-                x: 0.14 + (Double(orderedColumn) + 0.5) * cellWidth + stagger + jitterX,
-                y: 0.91 - (Double(row) + 0.5) * cellHeight + jitterY,
-                width: 0.046 * scale,
-                height: 0.032 * scale,
-                rotation: centeredNoise(index: index, salt: 101) * 18
+                x: 0.13 + (Double(orderedColumn) + 0.5) * cellWidth + stagger + rowDrift + jitterX,
+                y: 0.88 - (Double(row) + 0.5) * cellHeight + jitterY,
+                width: 0.155 * scale,
+                height: 0.19 * scale,
+                rotation: centeredNoise(index: index, salt: 101) * 52
             )
         }
     }
@@ -170,162 +353,139 @@ enum AcornJarLayout {
 
 private struct FallingAcornView: View {
     let placement: ResolvedAcornPlacement
+    let isGolden: Bool
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isSettled = false
 
     var body: some View {
-        Canvas { context, size in
-            AcornRenderer.draw(
-                in: &context,
-                placement: ResolvedAcornPlacement(
-                    center: CGPoint(x: size.width / 2, y: size.height / 2),
-                    size: placement.size,
-                    rotation: .zero
-                )
-            )
-        }
-        .frame(width: placement.size.width * 2.4, height: placement.size.height * 2.4)
-        .position(placement.center)
-        .offset(y: reduceMotion || isSettled ? 0 : -(placement.center.y + placement.size.height * 3))
-        .rotationEffect(isSettled ? placement.rotation : placement.rotation - .degrees(95))
-        .scaleEffect(isSettled ? 1 : (reduceMotion ? 0.9 : 1.08))
-        .opacity(isSettled ? 1 : (reduceMotion ? 0 : 1))
-        .task {
-            await Task.yield()
+        Image(isGolden ? "GoldenAcornSprite" : "AcornSprite")
+            .resizable()
+            .scaledToFit()
+            .frame(width: placement.size.width, height: placement.size.height)
+            .shadow(color: Color.black.opacity(0.22), radius: 2, y: 2)
+            .position(placement.center)
+            .offset(y: reduceMotion || isSettled ? 0 : -(placement.center.y + placement.size.height * 3))
+            .rotationEffect(isSettled ? placement.rotation : placement.rotation - .degrees(95))
+            .scaleEffect(isSettled ? 1 : (reduceMotion ? 0.9 : 1.10))
+            .opacity(isSettled ? 1 : (reduceMotion ? 0 : 1))
+            .task {
+                await Task.yield()
 
-            if reduceMotion {
-                withAnimation(.easeOut(duration: 0.24)) {
-                    isSettled = true
-                }
-            } else {
-                withAnimation(.spring(response: 0.82, dampingFraction: 0.68)) {
-                    isSettled = true
+                if reduceMotion {
+                    withAnimation(.easeOut(duration: 0.24)) {
+                        isSettled = true
+                    }
+                } else {
+                    withAnimation(.spring(response: 0.86, dampingFraction: 0.67)) {
+                        isSettled = true
+                    }
                 }
             }
-        }
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
     }
 }
 
 private enum AcornRenderer {
     static func draw(
+        _ image: GraphicsContext.ResolvedImage,
         in context: inout GraphicsContext,
         placement: ResolvedAcornPlacement
     ) {
         context.drawLayer { layer in
             layer.translateBy(x: placement.center.x, y: placement.center.y)
             layer.rotate(by: placement.rotation)
-
-            let width = placement.size.width
-            let height = placement.size.height
-            let bodyRect = CGRect(
-                x: -width / 2,
-                y: -height * 0.30,
-                width: width,
-                height: height * 0.86
-            )
-
-            var body = Path()
-            body.move(to: CGPoint(x: bodyRect.midX, y: bodyRect.maxY))
-            body.addCurve(
-                to: CGPoint(x: bodyRect.minX, y: bodyRect.minY + bodyRect.height * 0.35),
-                control1: CGPoint(x: bodyRect.minX + width * 0.20, y: bodyRect.maxY),
-                control2: CGPoint(x: bodyRect.minX, y: bodyRect.midY)
-            )
-            body.addQuadCurve(
-                to: CGPoint(x: bodyRect.maxX, y: bodyRect.minY + bodyRect.height * 0.35),
-                control: CGPoint(x: bodyRect.midX, y: bodyRect.minY - height * 0.10)
-            )
-            body.addCurve(
-                to: CGPoint(x: bodyRect.midX, y: bodyRect.maxY),
-                control1: CGPoint(x: bodyRect.maxX, y: bodyRect.midY),
-                control2: CGPoint(x: bodyRect.maxX - width * 0.20, y: bodyRect.maxY)
-            )
-
-            layer.fill(
-                body,
-                with: .linearGradient(
-                    Gradient(colors: [AppTheme.acornLight, AppTheme.acorn, AppTheme.acornDark]),
-                    startPoint: CGPoint(x: bodyRect.minX, y: bodyRect.minY),
-                    endPoint: CGPoint(x: bodyRect.maxX, y: bodyRect.maxY)
+            layer.addFilter(.shadow(color: Color.black.opacity(0.20), radius: 1.5, x: 0, y: 1.5))
+            layer.draw(
+                image,
+                in: CGRect(
+                    x: -placement.size.width / 2,
+                    y: -placement.size.height / 2,
+                    width: placement.size.width,
+                    height: placement.size.height
                 )
             )
-
-            let capRect = CGRect(
-                x: -width * 0.52,
-                y: -height * 0.42,
-                width: width * 1.04,
-                height: height * 0.34
-            )
-            layer.fill(
-                Path(roundedRect: capRect, cornerRadius: height * 0.12),
-                with: .linearGradient(
-                    Gradient(colors: [AppTheme.acornCapLight, AppTheme.acornCap]),
-                    startPoint: CGPoint(x: capRect.minX, y: capRect.minY),
-                    endPoint: CGPoint(x: capRect.maxX, y: capRect.maxY)
-                )
-            )
-
-            var stem = Path()
-            stem.move(to: CGPoint(x: 0, y: capRect.minY + 1))
-            stem.addQuadCurve(
-                to: CGPoint(x: width * 0.12, y: capRect.minY - height * 0.18),
-                control: CGPoint(x: width * 0.02, y: capRect.minY - height * 0.12)
-            )
-            layer.stroke(stem, with: .color(AppTheme.acornCap), lineWidth: max(width * 0.10, 0.8))
         }
     }
 }
 
-private struct GlassJarShape: Shape {
+private struct GlassJarShape: InsettableShape {
+    var insetAmount: CGFloat = 0
+
     func path(in rect: CGRect) -> Path {
+        let rect = rect.insetBy(dx: insetAmount, dy: insetAmount)
         var path = Path()
-        let neckWidth = rect.width * 0.48
+        let neckWidth = rect.width * 0.52
         let neckLeft = rect.midX - neckWidth / 2
         let neckRight = rect.midX + neckWidth / 2
-        let shoulderY = rect.height * 0.23
+        let shoulderY = rect.height * 0.24
+        let baseY = rect.maxY - rect.height * 0.035
 
-        path.move(to: CGPoint(x: neckLeft, y: rect.minY + 4))
-        path.addLine(to: CGPoint(x: neckRight, y: rect.minY + 4))
+        path.move(to: CGPoint(x: neckLeft, y: rect.minY + 7))
+        path.addLine(to: CGPoint(x: neckRight, y: rect.minY + 7))
         path.addLine(to: CGPoint(x: neckRight, y: rect.height * 0.12))
         path.addCurve(
-            to: CGPoint(x: rect.maxX - 8, y: shoulderY),
-            control1: CGPoint(x: neckRight, y: rect.height * 0.17),
-            control2: CGPoint(x: rect.maxX - 8, y: rect.height * 0.16)
+            to: CGPoint(x: rect.maxX - 7, y: shoulderY),
+            control1: CGPoint(x: neckRight, y: rect.height * 0.18),
+            control2: CGPoint(x: rect.maxX - 7, y: rect.height * 0.15)
         )
-        path.addLine(to: CGPoint(x: rect.maxX - 8, y: rect.maxY - 24))
+        path.addLine(to: CGPoint(x: rect.maxX - 7, y: rect.maxY - rect.height * 0.13))
+        path.addCurve(
+            to: CGPoint(x: rect.maxX - rect.width * 0.14, y: baseY),
+            control1: CGPoint(x: rect.maxX - 7, y: rect.maxY - rect.height * 0.06),
+            control2: CGPoint(x: rect.maxX - rect.width * 0.08, y: baseY)
+        )
         path.addQuadCurve(
-            to: CGPoint(x: rect.maxX - 30, y: rect.maxY - 4),
-            control: CGPoint(x: rect.maxX - 8, y: rect.maxY - 4)
+            to: CGPoint(x: rect.minX + rect.width * 0.14, y: baseY),
+            control: CGPoint(x: rect.midX, y: rect.maxY)
         )
-        path.addLine(to: CGPoint(x: rect.minX + 30, y: rect.maxY - 4))
-        path.addQuadCurve(
-            to: CGPoint(x: rect.minX + 8, y: rect.maxY - 24),
-            control: CGPoint(x: rect.minX + 8, y: rect.maxY - 4)
+        path.addCurve(
+            to: CGPoint(x: rect.minX + 7, y: rect.maxY - rect.height * 0.13),
+            control1: CGPoint(x: rect.minX + rect.width * 0.08, y: baseY),
+            control2: CGPoint(x: rect.minX + 7, y: rect.maxY - rect.height * 0.06)
         )
-        path.addLine(to: CGPoint(x: rect.minX + 8, y: shoulderY))
+        path.addLine(to: CGPoint(x: rect.minX + 7, y: shoulderY))
         path.addCurve(
             to: CGPoint(x: neckLeft, y: rect.height * 0.12),
-            control1: CGPoint(x: rect.minX + 8, y: rect.height * 0.16),
-            control2: CGPoint(x: neckLeft, y: rect.height * 0.17)
+            control1: CGPoint(x: rect.minX + 7, y: rect.height * 0.15),
+            control2: CGPoint(x: neckLeft, y: rect.height * 0.18)
         )
         path.closeSubpath()
         return path
     }
+
+    func inset(by amount: CGFloat) -> GlassJarShape {
+        var shape = self
+        shape.insetAmount += amount
+        return shape
+    }
 }
 
-#Preview("오늘의 도토리") {
-    AcornJarView(acornCount: 116, capacity: 365, latestAcornPresentation: .falling)
-        .frame(width: 230, height: 300)
-        .padding()
-        .background(AppTheme.background)
+#Preview("사실적인 도토리 병") {
+    AcornJarView(
+        acornCount: 116,
+        capacity: 365,
+        milestones: [
+            JarMilestone(
+                dayInJar: 100,
+                milestone: AnniversaryMilestone(
+                    elapsedDay: 100,
+                    date: .now,
+                    kinds: [.hundredDay(100)]
+                )
+            )
+        ],
+        latestAcornPresentation: .falling
+    )
+    .frame(width: 250, height: 320)
+    .padding(32)
+    .background(AppTheme.background)
 }
 
-#Preview("가득 찬 병") {
-    AcornJarView(acornCount: 366, capacity: 366)
-        .frame(width: 230, height: 300)
-        .padding()
+#Preview("1년 구간") {
+    AcornJarView(acornCount: 364, capacity: 365)
+        .frame(width: 250, height: 320)
+        .padding(32)
         .background(AppTheme.background)
 }

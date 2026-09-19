@@ -23,8 +23,19 @@ struct DotoryCountApp: App {
                 configurations: configuration
             )
 
-            if isUITesting, arguments.contains("--ui-testing-seeded-anniversary") {
-                let startDate = Calendar.current.date(byAdding: .day, value: -22, to: .now) ?? .now
+            if isUITesting,
+               (arguments.contains("--ui-testing-seeded-anniversary")
+                || arguments.contains("--ui-testing-100-day-anniversary")
+                || arguments.contains("--ui-testing-full-jar")) {
+                let elapsedDays: Int
+                if arguments.contains("--ui-testing-full-jar") {
+                    elapsedDays = 364
+                } else if arguments.contains("--ui-testing-100-day-anniversary") {
+                    elapsedDays = 100
+                } else {
+                    elapsedDays = 22
+                }
+                let startDate = Calendar.current.date(byAdding: .day, value: -elapsedDays, to: .now) ?? .now
                 modelContainer.mainContext.insert(
                     Anniversary(title: "우리의 시작", startDate: startDate)
                 )

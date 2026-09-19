@@ -2,6 +2,22 @@
 
 All notable changes to DotoryCount are recorded in this file.
 
+## [0.3.0] - 2026-09-19
+
+### Added
+
+- Photorealistic acorn and golden-acorn artwork derived from the app icon's visual language.
+- Golden acorns for every 100-day milestone and yearly anniversary.
+- A celebration banner for milestones and a tappable milestone detail sheet.
+- Unit and UI coverage for visual intervals and golden milestones.
+
+### Changed
+
+- Rebuilt the glass jar with layered reflections, refraction, rim depth, and a curved glass base.
+- Replaced one-sprite-per-day rendering with a dense visual scale: exact daily acorns through day 14, then one acorn per seven-day interval.
+- Preserved exact day and milestone calculations while limiting a yearly jar to about 64 large, detailed acorns.
+- Bumped the app to version 0.3.0 (build 4).
+
 ## [0.2.0] - 2026-09-14
 
 ### Added
