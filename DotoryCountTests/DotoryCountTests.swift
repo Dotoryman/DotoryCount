@@ -104,6 +104,15 @@ struct DotoryCountTests {
         })
     }
 
+    @Test("도토리 스프라이트는 원본 비율을 유지하는 정사각형에 그린다")
+    func acornSpritePreservesAspectRatio() {
+        let placement = AcornJarLayout.placements(visibleCount: 1)[0]
+        let resolved = placement.resolved(in: CGSize(width: 250, height: 320))
+
+        #expect(resolved.spriteSize.width == resolved.spriteSize.height)
+        #expect(resolved.spriteSize.width == min(resolved.size.width, resolved.size.height))
+    }
+
     @Test("잘못된 도토리 수는 안전한 표시 범위로 제한한다")
     func acornLayoutClampsCount() {
         #expect(AcornJarLayout.placements(dayCount: -1).isEmpty)
