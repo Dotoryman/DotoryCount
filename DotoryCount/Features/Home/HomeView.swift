@@ -92,6 +92,7 @@ private struct AnniversaryDashboard: View {
     let editAction: () -> Void
 
     @State private var latestAcornPresentation: LatestAcornPresentation = .hidden
+    @State private var selectedMilestone: AnniversaryMilestone?
 
     private var progress: AnniversaryProgress {
         AnniversaryCalculator.progress(from: anniversary.startDate)
@@ -113,6 +114,10 @@ private struct AnniversaryDashboard: View {
                 }
                 .padding(.top, 12)
 
+                if let milestone = progress.todayMilestone {
+                    celebrationBanner(milestone)
+                }
+
                 jarCard
                 milestoneCard
             }
@@ -127,6 +132,9 @@ private struct AnniversaryDashboard: View {
                     .accessibilityIdentifier("edit-anniversary-button")
             }
         }
+        .sheet(item: $selectedMilestone) { milestone in
+            MilestoneDetailView(milestone: milestone)
+        }
     }
 
     private var jarCard: some View {
@@ -134,17 +142,25 @@ private struct AnniversaryDashboard: View {
             AcornJarView(
                 acornCount: progress.acornsInCurrentJar,
                 capacity: progress.currentJarCapacity,
-                latestAcornPresentation: latestAcornPresentation
+                milestones: progress.jarMilestones,
+                latestAcornPresentation: latestAcornPresentation,
+                celebratingMilestone: progress.todayMilestone,
+                onMilestoneTapped: { selectedMilestone = $0 }
             )
-            .frame(width: 220, height: 280)
+            .frame(width: 250, height: 320)
 
             if progress.isWaitingToStart {
                 Text("시작일까지 \(abs(progress.elapsedDays))일 남았어요")
                     .font(.headline)
             } else {
-                Text("가득 찬 병 \(progress.completedJars)개 · 새 병에 도토리 \(progress.acornsInCurrentJar)개")
-                    .font(.headline)
-                    .multilineTextAlignment(.center)
+                VStack(spacing: 5) {
+                    Text("이번 병에 담긴 시간 \(progress.acornsInCurrentJar)일")
+                        .font(.headline)
+                    Text("\(jarFillPercentage)% 채움 · 완성한 병 \(progress.completedJars)개")
+                        .font(.subheadline)
+                        .foregroundStyle(AppTheme.secondaryText)
+                }
+                .multilineTextAlignment(.center)
             }
         }
         .frame(maxWidth: .infinity)
@@ -153,6 +169,50 @@ private struct AnniversaryDashboard: View {
         .task(id: progress.elapsedDays) {
             await prepareDailyAcornAnimation()
         }
+    }
+
+    private var jarFillPercentage: Int {
+        guard progress.currentJarCapacity > 0 else { return 0 }
+        return min(
+            Int((Double(progress.acornsInCurrentJar) / Double(progress.currentJarCapacity) * 100).rounded()),
+            100
+        )
+    }
+
+    private func celebrationBanner(_ milestone: AnniversaryMilestone) -> some View {
+        HStack(spacing: 13) {
+            Image("GoldenAcornSprite")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 46, height: 52)
+                .shadow(color: Color.yellow.opacity(0.34), radius: 8)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text("오늘은 \(milestone.title)")
+                    .font(.headline)
+                Text("황금도토리가 반짝이는 특별한 날이에요.")
+                    .font(.subheadline)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(16)
+        .background(
+            LinearGradient(
+                colors: [Color.yellow.opacity(0.22), AppTheme.surface],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius)
+                .stroke(Color.yellow.opacity(0.30), lineWidth: 1)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("milestone-celebration")
     }
 
     private var milestoneCard: some View {
@@ -188,6 +248,11 @@ private struct AnniversaryDashboard: View {
             return
         }
 
+        guard AcornJarLayout.addsVisualAcorn(onDay: progress.acornsInCurrentJar) else {
+            latestAcornPresentation = .static
+            return
+        }
+
         let defaultsKey = "lastAnimatedElapsedDay.\(anniversary.id.uuidString)"
         let lastAnimatedDay = UserDefaults.standard.object(forKey: defaultsKey) as? Int
         let forcesAnimation = ProcessInfo.processInfo.arguments.contains("--replay-acorn-animation")
@@ -207,5 +272,58 @@ private struct AnniversaryDashboard: View {
 
         try? await Task.sleep(for: .seconds(1.2))
         latestAcornPresentation = .static
+    }
+}
+
+private struct MilestoneDetailView: View {
+    let milestone: AnniversaryMilestone
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+
+            ZStack {
+                Circle()
+                    .fill(Color.yellow.opacity(0.16))
+                    .frame(width: 170, height: 170)
+                    .blur(radius: 2)
+
+                Image("GoldenAcornSprite")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 138, height: 150)
+                    .shadow(color: Color.yellow.opacity(0.34), radius: 16, y: 6)
+            }
+            .accessibilityHidden(true)
+
+            VStack(spacing: 8) {
+                Text(milestone.title)
+                    .font(.largeTitle.bold())
+                Text(milestone.date.formatted(date: .long, time: .omitted))
+                    .font(.headline)
+                    .foregroundStyle(AppTheme.secondaryText)
+                Text(milestone.detail)
+                    .font(.body)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 4)
+            }
+
+            Spacer()
+
+            Button("닫기") {
+                dismiss()
+            }
+            .font(.headline)
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.roundedRectangle(radius: 16))
+            .frame(maxWidth: .infinity)
+        }
+        .padding(28)
+        .background(AppTheme.background.ignoresSafeArea())
+        .presentationDetents([.medium])
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("milestone-detail")
     }
 }

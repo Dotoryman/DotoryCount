@@ -75,31 +75,65 @@ struct DotoryCountTests {
 
     @Test("도토리 배치는 개수가 늘어도 기존 위치를 유지한다")
     func acornLayoutIsStable() {
-        let initial = AcornJarLayout.placements(count: 120)
-        let expanded = AcornJarLayout.placements(count: 121)
+        let initial = AcornJarLayout.placements(visibleCount: 40)
+        let expanded = AcornJarLayout.placements(visibleCount: 41)
 
         #expect(Array(expanded.prefix(initial.count)) == initial)
     }
 
-    @Test("윤년의 모든 도토리가 병 안 안전 영역에 배치된다")
-    func leapYearAcornsStayInsideJar() {
-        let placements = AcornJarLayout.placements(count: 366)
+    @Test("1년은 최대 64개의 사실적인 도토리로 촘촘하게 표현한다")
+    func yearlyDisplayScaleUsesDenseIntervals() {
+        #expect(AcornJarLayout.displayedCount(for: 0) == 0)
+        #expect(AcornJarLayout.displayedCount(for: 14) == 14)
+        #expect(AcornJarLayout.displayedCount(for: 15) == 15)
+        #expect(AcornJarLayout.displayedCount(for: 21) == 15)
+        #expect(AcornJarLayout.displayedCount(for: 22) == 16)
+        #expect(AcornJarLayout.displayedCount(for: 364) == 64)
+    }
 
-        #expect(placements.count == 366)
+    @Test("모든 표현용 도토리가 병 안 안전 영역에 배치된다")
+    func visualAcornsStayInsideJar() {
+        let placements = AcornJarLayout.placements(visibleCount: 64)
+
+        #expect(placements.count == 64)
         #expect(placements.allSatisfy { placement in
-            placement.x - placement.width / 2 >= 0.10
-                && placement.x + placement.width / 2 <= 0.90
+            placement.x - placement.width / 2 >= 0.03
+                && placement.x + placement.width / 2 <= 0.97
                 && placement.y - placement.height / 2 >= 0.20
-                && placement.y + placement.height / 2 <= 0.94
+                && placement.y + placement.height / 2 <= 0.97
         })
     }
 
     @Test("잘못된 도토리 수는 안전한 표시 범위로 제한한다")
     func acornLayoutClampsCount() {
-        #expect(AcornJarLayout.placements(count: -1).isEmpty)
+        #expect(AcornJarLayout.placements(dayCount: -1).isEmpty)
         #expect(
-            AcornJarLayout.placements(count: 1_000).count
+            AcornJarLayout.placements(dayCount: 1_000).count
                 == AcornJarLayout.maximumVisibleCount
         )
+    }
+
+    @Test("100일은 현재 병의 황금도토리로 계산한다")
+    func hundredDayCreatesGoldenAcorn() throws {
+        let start = try #require(calendar.date(from: DateComponents(year: 2026, month: 1, day: 1)))
+        let current = try #require(calendar.date(byAdding: .day, value: 100, to: start))
+        let progress = AnniversaryCalculator.progress(from: start, to: current, calendar: calendar)
+
+        #expect(progress.todayMilestone?.title == "100일")
+        #expect(progress.jarMilestones.count == 1)
+        #expect(progress.jarMilestones.first?.dayInJar == 100)
+        #expect(AcornJarLayout.visualIndex(forDay: 100) == 26)
+    }
+
+    @Test("주년 다음 날 첫 도토리는 이전 주년을 황금으로 간직한다")
+    func anniversaryStartsWithGoldenAcorn() throws {
+        let start = try #require(calendar.date(from: DateComponents(year: 2025, month: 9, day: 19)))
+        let current = try #require(calendar.date(from: DateComponents(year: 2026, month: 9, day: 20)))
+        let progress = AnniversaryCalculator.progress(from: start, to: current, calendar: calendar)
+
+        #expect(progress.completedJars == 1)
+        #expect(progress.acornsInCurrentJar == 1)
+        #expect(progress.jarMilestones.first?.dayInJar == 1)
+        #expect(progress.jarMilestones.first?.milestone.title == "1주년")
     }
 }

@@ -37,7 +37,20 @@ final class DotoryCountUITests: XCTestCase {
 
         let jar = app.otherElements["acorn-jar"]
         XCTAssertTrue(jar.waitForExistence(timeout: 3))
-        XCTAssertTrue((jar.value as? String)?.contains("도토리 22개") == true)
+        XCTAssertTrue((jar.value as? String)?.contains("함께한 날 22일") == true)
+    }
+
+    @MainActor
+    func testHundredDayMilestoneShowsGoldenAcornDetail() throws {
+        let app = launchApp(additionalArguments: ["--ui-testing-100-day-anniversary"])
+
+        XCTAssertTrue(app.staticTexts["오늘은 100일"].waitForExistence(timeout: 3))
+
+        let goldenAcorn = app.buttons["황금도토리 100일"]
+        XCTAssertTrue(goldenAcorn.waitForExistence(timeout: 3))
+        goldenAcorn.tap()
+
+        XCTAssertTrue(app.staticTexts["함께한 시간을 황금도토리로 간직했어요."].waitForExistence(timeout: 3))
     }
 
     @MainActor
