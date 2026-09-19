@@ -2,6 +2,20 @@
 
 All notable changes to DotoryCount are recorded in this file.
 
+## [0.3.1] - 2026-09-20
+
+### Added
+
+- Replayable acorn-drop animation whenever the dashboard is tapped.
+- Acorn-drop replay after app launch, foreground return, and dismissal of editor or milestone screens.
+- UI coverage for tap-triggered and screen-return animations.
+
+### Fixed
+
+- Preserved the square sprite aspect ratio in Canvas so acorns are no longer stretched.
+- Tightened scale, rotation, overlap, and row spacing for a more natural layered pile.
+- Bumped the app to version 0.3.1 (build 5).
+
 ## [0.3.0] - 2026-09-19
 
 ### Added

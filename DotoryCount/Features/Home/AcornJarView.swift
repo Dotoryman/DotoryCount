@@ -60,7 +60,8 @@ struct AcornJarView: View {
     private var accessibilityValue: String {
         let goldenCount = milestones.count
         let suffix = goldenCount > 0 ? ", 황금도토리 \(goldenCount)개" : ""
-        return "함께한 날 \(acornCount)일, 1년 \(capacity)일\(suffix)"
+        let animationStatus = latestAcornPresentation == .falling ? ", 도토리 떨어지는 중" : ""
+        return "함께한 날 \(acornCount)일, 1년 \(capacity)일\(suffix)\(animationStatus)"
     }
 
     private var jarInterior: some View {
@@ -190,6 +191,7 @@ struct AcornJarView: View {
     ) -> some View {
         ForEach(visualMilestones) { item in
             let placement = item.placement.resolved(in: size)
+            let spriteSize = placement.spriteSize
 
             Button {
                 onMilestoneTapped(item.milestone)
@@ -201,7 +203,7 @@ struct AcornJarView: View {
                                 colors: [Color.yellow.opacity(0.30), Color.yellow.opacity(0.06), Color.clear],
                                 center: .center,
                                 startRadius: 1,
-                                endRadius: max(placement.size.width, placement.size.height)
+                                endRadius: max(spriteSize.width, spriteSize.height)
                             )
                         )
                         .blendMode(.screen)
@@ -209,7 +211,7 @@ struct AcornJarView: View {
                     Image("GoldenAcornSprite")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: placement.size.width, height: placement.size.height)
+                        .frame(width: spriteSize.width, height: spriteSize.height)
                         .rotationEffect(placement.rotation)
                         .shadow(color: Color.yellow.opacity(0.35), radius: 3, y: 1)
                 }
@@ -264,6 +266,11 @@ struct ResolvedAcornPlacement {
     let center: CGPoint
     let size: CGSize
     let rotation: Angle
+
+    var spriteSize: CGSize {
+        let side = min(size.width, size.height)
+        return CGSize(width: side, height: side)
+    }
 }
 
 private struct VisualMilestone: Identifiable {
@@ -278,12 +285,10 @@ enum AcornJarLayout {
     static let exactDayLimit = 14
     static let daysPerVisualAcorn = 7
 
-    private static let columns = 8
-    private static let rows = 8
-    private static let columnOrder = [3, 4, 2, 5, 1, 6, 0, 7]
+    private static let rowCapacities = [9, 7, 9, 7, 9, 7, 9, 7]
 
     static var maximumVisibleCount: Int {
-        columns * rows
+        rowCapacities.reduce(0, +)
     }
 
     static func displayedCount(for dayCount: Int) -> Int {
@@ -316,25 +321,52 @@ enum AcornJarLayout {
 
     static func placements(visibleCount: Int) -> [AcornPlacement] {
         let count = min(max(visibleCount, 0), maximumVisibleCount)
-        let cellWidth = 0.74 / Double(columns)
-        let cellHeight = 0.59 / Double(rows)
+        let cellHeight = 0.50 / Double(rowCapacities.count)
 
         return (0..<count).map { index in
-            let row = index / columns
-            let orderedColumn = columnOrder[index % columns]
-            let stagger = row.isMultiple(of: 2) ? -cellWidth * 0.12 : cellWidth * 0.12
-            let rowDrift = centeredNoise(index: row, salt: 149) * cellWidth * 0.20
-            let jitterX = centeredNoise(index: index, salt: 17) * cellWidth * 0.24
+            let rowPosition = rowPosition(for: index)
+            let row = rowPosition.row
+            let capacity = rowCapacities[row]
+            let orderedSlot = centerOutSlots(for: capacity)[rowPosition.indexInRow]
+            let slotOffset = Double(orderedSlot) - Double(capacity - 1) / 2
+            let horizontalSpacing = 0.082
+            let rowDrift = centeredNoise(index: row, salt: 149) * 0.012
+            let jitterX = centeredNoise(index: index, salt: 17) * 0.014
             let jitterY = centeredNoise(index: index, salt: 43) * cellHeight * 0.18
-            let scale = 0.84 + unitNoise(index: index, salt: 71) * 0.28
+            let scale = 0.86 + unitNoise(index: index, salt: 71) * 0.24
 
             return AcornPlacement(
-                x: 0.13 + (Double(orderedColumn) + 0.5) * cellWidth + stagger + rowDrift + jitterX,
+                x: 0.50 + slotOffset * horizontalSpacing + rowDrift + jitterX,
                 y: 0.88 - (Double(row) + 0.5) * cellHeight + jitterY,
-                width: 0.155 * scale,
-                height: 0.19 * scale,
-                rotation: centeredNoise(index: index, salt: 101) * 52
+                width: 0.15 * scale,
+                height: 0.18 * scale,
+                rotation: centeredNoise(index: index, salt: 101) * 38
             )
+        }
+    }
+
+    private static func rowPosition(for index: Int) -> (row: Int, indexInRow: Int) {
+        var remaining = index
+
+        for (row, capacity) in rowCapacities.enumerated() {
+            if remaining < capacity {
+                return (row, remaining)
+            }
+            remaining -= capacity
+        }
+
+        return (rowCapacities.count - 1, rowCapacities.last.map { $0 - 1 } ?? 0)
+    }
+
+    private static func centerOutSlots(for capacity: Int) -> [Int] {
+        let center = Double(capacity - 1) / 2
+        return (0..<capacity).sorted { lhs, rhs in
+            let lhsDistance = abs(Double(lhs) - center)
+            let rhsDistance = abs(Double(rhs) - center)
+            if lhsDistance == rhsDistance {
+                return lhs < rhs
+            }
+            return lhsDistance < rhsDistance
         }
     }
 
@@ -359,10 +391,12 @@ private struct FallingAcornView: View {
     @State private var isSettled = false
 
     var body: some View {
+        let spriteSize = placement.spriteSize
+
         Image(isGolden ? "GoldenAcornSprite" : "AcornSprite")
             .resizable()
             .scaledToFit()
-            .frame(width: placement.size.width, height: placement.size.height)
+            .frame(width: spriteSize.width, height: spriteSize.height)
             .shadow(color: Color.black.opacity(0.22), radius: 2, y: 2)
             .position(placement.center)
             .offset(y: reduceMotion || isSettled ? 0 : -(placement.center.y + placement.size.height * 3))
@@ -393,17 +427,19 @@ private enum AcornRenderer {
         in context: inout GraphicsContext,
         placement: ResolvedAcornPlacement
     ) {
+        let side = placement.spriteSize.width
+
         context.drawLayer { layer in
             layer.translateBy(x: placement.center.x, y: placement.center.y)
             layer.rotate(by: placement.rotation)
-            layer.addFilter(.shadow(color: Color.black.opacity(0.20), radius: 1.5, x: 0, y: 1.5))
+            layer.addFilter(.shadow(color: Color.black.opacity(0.24), radius: 2, x: 0, y: 2))
             layer.draw(
                 image,
                 in: CGRect(
-                    x: -placement.size.width / 2,
-                    y: -placement.size.height / 2,
-                    width: placement.size.width,
-                    height: placement.size.height
+                    x: -side / 2,
+                    y: -side / 2,
+                    width: side,
+                    height: side
                 )
             )
         }

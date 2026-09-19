@@ -4,11 +4,15 @@ import SwiftUI
 struct HomeView: View {
     @Query(sort: \Anniversary.createdAt) private var anniversaries: [Anniversary]
     @State private var presentedSheet: AnniversarySheet?
+    @State private var dashboardReplayToken = 0
 
     var body: some View {
         Group {
             if let anniversary = anniversaries.first {
-                AnniversaryDashboard(anniversary: anniversary) {
+                AnniversaryDashboard(
+                    anniversary: anniversary,
+                    replayToken: dashboardReplayToken
+                ) {
                     presentedSheet = .edit(anniversary)
                 }
             } else {
@@ -25,6 +29,10 @@ struct HomeView: View {
             case .edit(let anniversary):
                 AnniversaryEditorView(anniversary: anniversary)
             }
+        }
+        .onChange(of: presentedSheet?.id) { previousSheet, currentSheet in
+            guard previousSheet != nil, currentSheet == nil else { return }
+            dashboardReplayToken &+= 1
         }
     }
 }
@@ -89,10 +97,13 @@ private struct EmptyAnniversaryView: View {
 
 private struct AnniversaryDashboard: View {
     let anniversary: Anniversary
+    let replayToken: Int
     let editAction: () -> Void
 
+    @Environment(\.scenePhase) private var scenePhase
     @State private var latestAcornPresentation: LatestAcornPresentation = .hidden
     @State private var selectedMilestone: AnniversaryMilestone?
+    @State private var animationTask: Task<Void, Never>?
 
     private var progress: AnniversaryProgress {
         AnniversaryCalculator.progress(from: anniversary.startDate)
@@ -135,6 +146,29 @@ private struct AnniversaryDashboard: View {
         .sheet(item: $selectedMilestone) { milestone in
             MilestoneDetailView(milestone: milestone)
         }
+        .contentShape(Rectangle())
+        .simultaneousGesture(
+            TapGesture().onEnded {
+                replayLatestAcorn()
+            }
+        )
+        .onAppear {
+            replayLatestAcorn(after: .milliseconds(350))
+        }
+        .onChange(of: scenePhase) { previousPhase, currentPhase in
+            guard previousPhase != .active, currentPhase == .active else { return }
+            replayLatestAcorn(after: .milliseconds(250))
+        }
+        .onChange(of: replayToken) { _, _ in
+            replayLatestAcorn(after: .milliseconds(180))
+        }
+        .onChange(of: selectedMilestone?.id) { previousMilestone, currentMilestone in
+            guard previousMilestone != nil, currentMilestone == nil else { return }
+            replayLatestAcorn(after: .milliseconds(180))
+        }
+        .onDisappear {
+            animationTask?.cancel()
+        }
     }
 
     private var jarCard: some View {
@@ -166,9 +200,6 @@ private struct AnniversaryDashboard: View {
         .frame(maxWidth: .infinity)
         .padding(24)
         .background(AppTheme.surface, in: RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius))
-        .task(id: progress.elapsedDays) {
-            await prepareDailyAcornAnimation()
-        }
     }
 
     private var jarFillPercentage: Int {
@@ -241,37 +272,27 @@ private struct AnniversaryDashboard: View {
         .background(AppTheme.surface, in: RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius))
     }
 
-    @MainActor
-    private func prepareDailyAcornAnimation() async {
+    private func replayLatestAcorn(after delay: Duration = .milliseconds(60)) {
         guard progress.elapsedDays > 0, progress.acornsInCurrentJar > 0 else {
             latestAcornPresentation = .static
             return
         }
 
-        guard AcornJarLayout.addsVisualAcorn(onDay: progress.acornsInCurrentJar) else {
+        animationTask?.cancel()
+        latestAcornPresentation = .hidden
+        let animationDuration: Duration = ProcessInfo.processInfo.arguments.contains("--ui-testing-slow-animation")
+            ? .seconds(3)
+            : .seconds(1.1)
+
+        animationTask = Task { @MainActor in
+            try? await Task.sleep(for: delay)
+            guard !Task.isCancelled else { return }
+            latestAcornPresentation = .falling
+
+            try? await Task.sleep(for: animationDuration)
+            guard !Task.isCancelled else { return }
             latestAcornPresentation = .static
-            return
         }
-
-        let defaultsKey = "lastAnimatedElapsedDay.\(anniversary.id.uuidString)"
-        let lastAnimatedDay = UserDefaults.standard.object(forKey: defaultsKey) as? Int
-        let forcesAnimation = ProcessInfo.processInfo.arguments.contains("--replay-acorn-animation")
-
-        guard forcesAnimation || lastAnimatedDay != progress.elapsedDays else {
-            latestAcornPresentation = .static
-            return
-        }
-
-        try? await Task.sleep(for: .milliseconds(450))
-        guard !Task.isCancelled else { return }
-
-        if !forcesAnimation {
-            UserDefaults.standard.set(progress.elapsedDays, forKey: defaultsKey)
-        }
-        latestAcornPresentation = .falling
-
-        try? await Task.sleep(for: .seconds(1.2))
-        latestAcornPresentation = .static
     }
 }
 
