@@ -2,6 +2,14 @@
 
 All notable changes to DotoryCount are recorded in this file.
 
+## [Unreleased] - 0.4.0 device preview
+
+- Replaced the home-screen jar card with the app-icon-led motion study.
+- Kept exact anniversary dates, milestones, and local SwiftData records intact.
+- Added tap, app-open, and return-to-home replay with a Reduced Motion still image.
+- The filmed jar is a fixed visual prototype; date-specific fill levels and the final
+  behind-glass landing sequence remain to be produced before a 0.4.0 release.
+
 ## [0.3.1] - 2026-09-20
 
 ### Added
