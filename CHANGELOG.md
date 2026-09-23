@@ -4,11 +4,17 @@ All notable changes to DotoryCount are recorded in this file.
 
 ## [Unreleased] - 0.4.0 device preview
 
-- Replaced the home-screen jar card with the app-icon-led motion study.
+- Replaced the fixed home-screen film with an icon-matched glass jar assembled from
+  a photographic empty jar, glass foreground, and individual acorn artwork.
+- Added 36 visual fill stages, including daily changes for the first eight days;
+  exact anniversary dates and yearly capacity remain unchanged.
+- Varied each replay's entry point, tumble, bounce, roll, and resting angle while
+  keeping the acorn's entry through the jar mouth visible.
+- Moved the jar above the supporting date panel so the two no longer overlap.
 - Kept exact anniversary dates, milestones, and local SwiftData records intact.
-- Added tap, app-open, and return-to-home replay with a Reduced Motion still image.
-- The filmed jar is a fixed visual prototype; date-specific fill levels and the final
-  behind-glass landing sequence remain to be produced before a 0.4.0 release.
+- Kept tap, app-open, and return-to-home replay with a Reduced Motion still scene.
+- The photographic composition is still a device preview; material and motion
+  polish will be reviewed before an official 0.4.0 release.
 
 ## [0.3.1] - 2026-09-20
 

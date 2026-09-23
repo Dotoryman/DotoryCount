@@ -38,7 +38,7 @@ final class DotoryCountUITests: XCTestCase {
             "--ui-testing-slow-animation"
         ])
 
-        let jar = app.otherElements["acorn-jar"]
+        let jar = app.buttons["acorn-jar"]
         XCTAssertTrue(jar.waitForExistence(timeout: 3))
         XCTAssertTrue((jar.value as? String)?.contains("함께한 날 22일") == true)
     }
@@ -62,7 +62,7 @@ final class DotoryCountUITests: XCTestCase {
             "--ui-testing-seeded-anniversary",
             "--ui-testing-slow-animation"
         ])
-        let jar = app.otherElements["acorn-jar"]
+        let jar = app.buttons["acorn-jar"]
 
         XCTAssertTrue(jar.waitForExistence(timeout: 3))
         XCTAssertTrue(waitForJarAnimation(jar, isRunning: true))
@@ -79,7 +79,7 @@ final class DotoryCountUITests: XCTestCase {
             "--ui-testing-seeded-anniversary",
             "--ui-testing-slow-animation"
         ])
-        let jar = app.otherElements["acorn-jar"]
+        let jar = app.buttons["acorn-jar"]
 
         XCTAssertTrue(jar.waitForExistence(timeout: 3))
         XCTAssertTrue(waitForJarAnimation(jar, isRunning: true))

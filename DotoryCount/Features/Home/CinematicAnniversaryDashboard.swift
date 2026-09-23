@@ -1,8 +1,6 @@
-import AVFoundation
 import SwiftUI
 
-/// An icon-led visual preview. The exact date remains in the data model and footer;
-/// the bundled film is a single art-direction study, not yet a per-day fill state.
+/// The jar is the primary scene; dates and milestones stay as supporting detail.
 struct CinematicAnniversaryDashboard: View {
     let anniversary: Anniversary
     let replayToken: Int
@@ -24,26 +22,12 @@ struct CinematicAnniversaryDashboard: View {
             Color(red: 1, green: 0.977, blue: 0.937)
                 .ignoresSafeArea()
 
-            Image("JarPreviewStill")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-                .accessibilityHidden(true)
-
-            if !reduceMotion {
-                JarMotionPlayerView(replayID: replayID)
-                    .ignoresSafeArea()
-                    .accessibilityHidden(true)
-            }
-
-            Button(action: replay) {
-                Color.clear
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("유리병 속 도토리 영상")
-            .accessibilityValue("함께한 날 \(progress.acornsInCurrentJar)일" + (isDropping ? ", 도토리 떨어지는 중" : ""))
-            .accessibilityIdentifier("acorn-jar")
+            PhotographicJarScene(
+                progress: progress,
+                replayID: replayID,
+                reduceMotion: reduceMotion
+            )
+            .allowsHitTesting(false)
 
             VStack(spacing: 0) {
                 header
@@ -55,6 +39,23 @@ struct CinematicAnniversaryDashboard: View {
                 footer
                     .padding(.horizontal, 26)
                     .padding(.bottom, 16)
+            }
+
+            GeometryReader { geometry in
+                Button(action: replay) {
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(
+                            width: geometry.size.width,
+                            height: max(160, min(geometry.size.height - 290, geometry.size.width * 1.12))
+                        )
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .position(x: geometry.size.width / 2, y: geometry.size.height / 2 - 12)
+                .accessibilityLabel("유리병 속 도토리")
+                .accessibilityValue("함께한 날 \(progress.acornsInCurrentJar)일" + (isDropping ? ", 도토리 떨어지는 중" : ""))
+                .accessibilityIdentifier("acorn-jar")
             }
 
         }
@@ -128,7 +129,7 @@ struct CinematicAnniversaryDashboard: View {
                     .accessibilityIdentifier("milestone-celebration")
                 }
             }
-            Text("영상 시안 · 화면을 탭하면 다시 재생됩니다")
+            Text("병을 탭하면 오늘의 도토리가 다시 떨어져요")
                 .font(.system(size: 11))
                 .foregroundStyle(AppTheme.secondaryText)
         }
@@ -138,60 +139,16 @@ struct CinematicAnniversaryDashboard: View {
 
     private func replay() {
         dropTask?.cancel()
-        guard !reduceMotion else {
+        guard !reduceMotion, progress.acornsInCurrentJar > 0 else {
             isDropping = false
             return
         }
         replayID &+= 1
         isDropping = true
         dropTask = Task { @MainActor in
-            try? await Task.sleep(for: .seconds(3))
+            try? await Task.sleep(for: .seconds(JarDropTiming.duration))
             guard !Task.isCancelled else { return }
             isDropping = false
         }
-    }
-}
-
-private struct JarMotionPlayerView: UIViewRepresentable {
-    let replayID: Int
-
-    func makeCoordinator() -> Coordinator { Coordinator() }
-
-    func makeUIView(context: Context) -> PlayerSurface {
-        let view = PlayerSurface()
-        guard let url = Bundle.main.url(forResource: "JarMotionPreview", withExtension: "mp4") else {
-            return view
-        }
-        let player = AVPlayer(url: url)
-        player.actionAtItemEnd = .pause
-        view.playerLayer.player = player
-        context.coordinator.player = player
-        return view
-    }
-
-    func updateUIView(_ view: PlayerSurface, context: Context) {
-        guard context.coordinator.lastReplayID != replayID else { return }
-        context.coordinator.lastReplayID = replayID
-        context.coordinator.player?.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
-        context.coordinator.player?.play()
-    }
-
-    final class Coordinator {
-        var player: AVPlayer?
-        var lastReplayID: Int?
-    }
-
-    final class PlayerSurface: UIView {
-        override static var layerClass: AnyClass { AVPlayerLayer.self }
-        var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
-
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            playerLayer.videoGravity = .resizeAspectFill
-            playerLayer.backgroundColor = UIColor(red: 1, green: 0.977, blue: 0.937, alpha: 1).cgColor
-            isUserInteractionEnabled = false
-        }
-
-        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     }
 }

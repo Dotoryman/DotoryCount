@@ -4,15 +4,22 @@ The existing `AppIcon-1024.png` is the visual reference for the new home screen:
 clear thick glass, a warm ivory background, natural brown acorns with scaled caps,
 and a single acorn falling into the jar. The date counter is secondary.
 
-`Textures/jar-clean.png` is an edited, transparent-background jar keyframe derived
-from that art direction. `Previews/logo-motion-reference.mp4` is a three-second
-**motion study**, not a finished in-app animation or a release asset. It uses the
-existing `AcornSprite` above the jar image to check scale, timing, and composition.
+`Textures/jar-clean.png` is the approved transparent-background art-direction
+reference. The built-in image-generation edit tool produced two project assets
+from it: `Textures/jar-empty-base.png` removes the original acorn pile, and
+`Textures/jar-glass-front.png` preserves the glass rim, walls, and highlights
+with a transparent center for foreground compositing. They are copied into
+`DotoryCount/Assets.xcassets` and layered around the existing acorn sprites.
+The edit prompts held the jar geometry, teal reflections, warm lighting,
+position, and transparent outer canvas fixed; only the acorns or central
+glass opacity changed.
 
-Before integration, the final sequence needs the acorn to pass behind the front
-glass, contact and settle into the pile without overlap, and support several
-visually distinct fill levels plus a golden-acorn milestone variant. It should
-also replay on tap, on opening the app, and when returning to the home screen.
+`Previews/logo-motion-reference.mp4` remains an earlier three-second **motion
+study**, not the current in-app animation or a release asset. The app now
+draws 36 date-dependent visual stages and animates the newest acorn in SwiftUI.
+
+Before an official release, inspect the pile and the rim crossing on the user's
+phone, especially at sparse, middle, full, and golden-acorn stages.
 
 Regenerate the motion study with `./Production/make_motion_reference.sh` after
 installing `ffmpeg`. The Blender renderer in this folder is an experiment; its

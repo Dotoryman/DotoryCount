@@ -145,4 +145,29 @@ struct DotoryCountTests {
         #expect(progress.jarMilestones.first?.dayInJar == 1)
         #expect(progress.jarMilestones.first?.milestone.title == "1주년")
     }
+
+    @Test("사진 병은 초반 8일을 하루씩, 연말까지 36단계로 채운다")
+    func photographicJarStages() {
+        #expect(PhotographicJarStages.stage(for: -1, capacity: 365) == 0)
+        for day in 0...8 {
+            #expect(PhotographicJarStages.stage(for: day, capacity: 365) == day)
+        }
+        #expect(PhotographicJarStages.stage(for: 9, capacity: 365) == 9)
+        #expect(PhotographicJarStages.stage(for: 364, capacity: 365) == 36)
+        #expect(PhotographicJarStages.stage(for: 365, capacity: 366) == 36)
+        let stages = (0...365).map { PhotographicJarStages.stage(for: $0, capacity: 366) }
+        #expect(stages == stages.sorted())
+        #expect(Set(stages).count == 37)
+    }
+
+    @Test("36개 도토리는 병 내부에 다양한 각도로 안정적으로 놓인다")
+    func photographicJarPlacements() {
+        let placements = PhotographicJarStages.placements
+        #expect(placements.count == 36)
+        #expect(Set(placements.map { Int($0.angle / 15) }).count > 5)
+        #expect(placements.allSatisfy {
+            $0.x - $0.size / 2 > 90 && $0.x + $0.size / 2 < 850
+                && $0.y - $0.size / 2 > 620 && $0.y + $0.size / 2 < 1350
+        })
+    }
 }
