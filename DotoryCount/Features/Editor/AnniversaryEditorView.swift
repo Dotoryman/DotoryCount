@@ -12,6 +12,7 @@ struct AnniversaryEditorView: View {
 
     @State private var title: String
     @State private var startDate: Date
+    @State private var dateSheet: DateSheetDestination?
     @State private var presentedAlert: EditorAlert?
     @FocusState private var isTitleFocused: Bool
 
@@ -31,8 +32,24 @@ struct AnniversaryEditorView: View {
                         .focused($isTitleFocused)
                         .accessibilityIdentifier("anniversary-title-field")
 
-                    DatePicker("기준일", selection: $startDate, displayedComponents: .date)
-                        .accessibilityIdentifier("anniversary-date-picker")
+                    Button {
+                        isTitleFocused = false
+                        dateSheet = .choose
+                    } label: {
+                        HStack {
+                            Text("기준일")
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            Text(startDate.formatted(date: .abbreviated, time: .omitted))
+                                .foregroundStyle(AppTheme.secondaryText)
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(AppTheme.secondaryText)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("anniversary-date-picker")
                 } header: {
                     Text("기념일")
                 } footer: {
@@ -80,6 +97,9 @@ struct AnniversaryEditorView: View {
                 if anniversary == nil {
                     isTitleFocused = true
                 }
+            }
+            .sheet(item: $dateSheet) { _ in
+                StartDateSelectionSheet(date: $startDate)
             }
             .alert(item: $presentedAlert) { alert in
                 switch alert {
@@ -140,6 +160,12 @@ struct AnniversaryEditorView: View {
             presentedAlert = .persistenceFailure
         }
     }
+}
+
+private enum DateSheetDestination: Identifiable {
+    case choose
+
+    var id: String { "choose-date" }
 }
 
 private enum EditorAlert: Identifiable {

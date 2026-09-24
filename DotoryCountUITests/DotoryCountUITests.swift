@@ -15,6 +15,24 @@ final class DotoryCountUITests: XCTestCase {
     }
 
     @MainActor
+    func testChooseStartDateWithQuickPreset() throws {
+        let app = launchApp()
+        app.buttons["create-anniversary-button"].tap()
+
+        let dateButton = app.buttons["anniversary-date-picker"]
+        XCTAssertTrue(dateButton.waitForExistence(timeout: 3))
+        dateButton.tap()
+        XCTAssertTrue(app.datePickers["anniversary-graphical-date-picker"].waitForExistence(timeout: 3))
+
+        app.buttons["직접 입력"].tap()
+        let dateField = app.textFields["anniversary-direct-date-field"]
+        XCTAssertTrue(dateField.waitForExistence(timeout: 3))
+        app.buttons["어제"].tap()
+        app.buttons["apply-anniversary-date-button"].tap()
+        XCTAssertTrue(dateButton.label.contains(String(Calendar.current.component(.year, from: .now))))
+    }
+
+    @MainActor
     func testDeleteAnniversaryFlow() throws {
         let app = launchApp()
         createAnniversary(in: app)
@@ -38,7 +56,7 @@ final class DotoryCountUITests: XCTestCase {
             "--ui-testing-slow-animation"
         ])
 
-        let jar = app.otherElements["acorn-jar"]
+        let jar = app.buttons["acorn-jar"]
         XCTAssertTrue(jar.waitForExistence(timeout: 3))
         XCTAssertTrue((jar.value as? String)?.contains("함께한 날 22일") == true)
     }
@@ -62,7 +80,7 @@ final class DotoryCountUITests: XCTestCase {
             "--ui-testing-seeded-anniversary",
             "--ui-testing-slow-animation"
         ])
-        let jar = app.otherElements["acorn-jar"]
+        let jar = app.buttons["acorn-jar"]
 
         XCTAssertTrue(jar.waitForExistence(timeout: 3))
         XCTAssertTrue(waitForJarAnimation(jar, isRunning: true))
@@ -79,7 +97,7 @@ final class DotoryCountUITests: XCTestCase {
             "--ui-testing-seeded-anniversary",
             "--ui-testing-slow-animation"
         ])
-        let jar = app.otherElements["acorn-jar"]
+        let jar = app.buttons["acorn-jar"]
 
         XCTAssertTrue(jar.waitForExistence(timeout: 3))
         XCTAssertTrue(waitForJarAnimation(jar, isRunning: true))

@@ -2,6 +2,25 @@
 
 All notable changes to DotoryCount are recorded in this file.
 
+## [0.4.0] - 2026-09-24
+
+- Replaced the fixed home-screen film with an icon-matched glass jar assembled from
+  a photographic empty jar, glass foreground, and individual acorn artwork.
+- Added 36 visual fill stages, including daily changes for the first eight days;
+  exact anniversary dates and yearly capacity remain unchanged.
+- Varied each replay's entry point, tumble, bounce, roll, and resting angle while
+  keeping the acorn's entry through the jar mouth visible.
+- Moved the jar above the supporting date panel so the two no longer overlap.
+- Kept exact anniversary dates, milestones, and local SwiftData records intact.
+- Kept tap, app-open, and return-to-home replay with a Reduced Motion still scene.
+- Replaced uniform rows with deterministic curved-floor collision placement.
+- Added side/back acorn views, varied resting angles, contact shadows, a base
+  shadow, softer depth shading, and correctly scaled golden acorns.
+- Reworked the base-date control into a dedicated calendar sheet with direct
+  date entry and quick presets for today, yesterday, and one year ago.
+- Added unit coverage for stable non-overlapping placement and date parsing.
+- Bumped the app to version 0.4.0 (build 8).
+
 ## [0.3.1] - 2026-09-20
 
 ### Added

@@ -9,7 +9,7 @@ struct HomeView: View {
     var body: some View {
         Group {
             if let anniversary = anniversaries.first {
-                AnniversaryDashboard(
+                CinematicAnniversaryDashboard(
                     anniversary: anniversary,
                     replayToken: dashboardReplayToken
                 ) {
@@ -296,7 +296,7 @@ private struct AnniversaryDashboard: View {
     }
 }
 
-private struct MilestoneDetailView: View {
+struct MilestoneDetailView: View {
     let milestone: AnniversaryMilestone
 
     @Environment(\.dismiss) private var dismiss
