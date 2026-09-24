@@ -144,9 +144,9 @@ struct PhotographicJarScene: View {
                 .frame(width: width, height: height)
 
             Ellipse()
-                .fill(.black.opacity(0.20))
-                .frame(width: 510 * scale, height: 108 * scale)
-                .blur(radius: 31 * scale)
+                .fill(.black.opacity(0.32))
+                .frame(width: 510 * scale, height: 82 * scale)
+                .blur(radius: 18 * scale)
                 .position(x: 470 * scale, y: 1282 * scale)
 
             Ellipse()
@@ -155,28 +155,44 @@ struct PhotographicJarScene: View {
                 .blur(radius: 54 * scale)
                 .position(x: 470 * scale, y: 1130 * scale)
 
-            ForEach(settledIndices, id: \.self) { index in
-                acorn(at: PhotographicJarStages.placements[index],
-                      golden: isGolden(index: index), scale: scale)
-            }
+            ZStack(alignment: .topLeading) {
+                ForEach(settledIndices, id: \.self) { index in
+                    acorn(at: PhotographicJarStages.placements[index],
+                          golden: isGolden(index: index), scale: scale)
+                }
 
-            if stage > 0 {
-                let placement = PhotographicJarStages.placements[stage - 1]
-                TimelineView(.animation(minimumInterval: 1.0 / 60, paused: !isAnimating)) { timeline in
-                    let elapsed = timeline.date.timeIntervalSince(dropStartedAt)
-                    let motion = isAnimating ? min(max(elapsed / JarDropTiming.duration, 0), 1) : 1
-                    let offset = fallingOffset(placement, progress: motion)
-                    acorn(at: placement,
-                          golden: isGolden(index: stage - 1),
-                          scale: scale,
-                          offset: offset,
-                          extraRotation: fallingRotation(progress: motion))
+                if stage > 0 {
+                    let placement = PhotographicJarStages.placements[stage - 1]
+                    TimelineView(.animation(minimumInterval: 1.0 / 60, paused: !isAnimating)) { timeline in
+                        let elapsed = timeline.date.timeIntervalSince(dropStartedAt)
+                        let motion = isAnimating ? min(max(elapsed / JarDropTiming.duration, 0), 1) : 1
+                        let offset = fallingOffset(placement, progress: motion)
+                        acorn(at: placement,
+                              golden: isGolden(index: stage - 1),
+                              scale: scale,
+                              offset: offset,
+                              extraRotation: fallingRotation(progress: motion))
+                    }
                 }
             }
+            .frame(width: width, height: height)
+            .mask(
+                JarInteriorFloorMask()
+                    .fill(.white)
+                    .blur(radius: 18 * scale)
+                    .frame(width: width, height: height)
+            )
 
             Image("JarGlassFront")
                 .resizable()
                 .frame(width: width, height: height)
+                .allowsHitTesting(false)
+
+            Ellipse()
+                .fill(.black.opacity(0.15))
+                .frame(width: 500 * scale, height: 42 * scale)
+                .blur(radius: 17 * scale)
+                .position(x: 470 * scale, y: 1283 * scale)
                 .allowsHitTesting(false)
 
             LinearGradient(
@@ -291,5 +307,25 @@ struct PhotographicJarScene: View {
             guard !Task.isCancelled else { return }
             isAnimating = false
         }
+    }
+}
+
+/// The front half of the thick glass base must hide any nut silhouette that
+/// passes below the inner floor. The curve follows the jar's photographed oval.
+private struct JarInteriorFloorMask: Shape {
+    func path(in rect: CGRect) -> Path {
+        let scale = rect.width / 941
+        var path = Path()
+        path.move(to: .zero)
+        path.addLine(to: CGPoint(x: rect.width, y: 0))
+        for step in stride(from: 941, through: 0, by: -5) {
+            let x = CGFloat(step)
+            let distance = x - 470
+            let floorY = 1284 - 0.00055 * distance * distance
+            path.addLine(to: CGPoint(x: x * scale, y: floorY * scale))
+        }
+        path.addLine(to: CGPoint(x: 0, y: (1284 - 0.00055 * 470 * 470) * scale))
+        path.closeSubpath()
+        return path
     }
 }

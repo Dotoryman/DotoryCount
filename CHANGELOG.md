@@ -2,6 +2,14 @@
 
 All notable changes to DotoryCount are recorded in this file.
 
+## [0.4.2] - 2026-09-24
+
+- Place the acorn pile behind the photographed front half of the glass floor
+  with a soft curved occlusion edge, so bottom acorns no longer show through
+  the thick base or appear outside the jar.
+- Add a contact shadow along the inner floor to ground sparse and full piles.
+- Bumped the app to version 0.4.2 (build 10).
+
 ## [0.4.1] - 2026-09-24
 
 - Keep the iPhone experience in portrait, where the photographic jar and date
