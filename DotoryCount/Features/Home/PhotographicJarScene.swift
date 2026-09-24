@@ -176,23 +176,16 @@ struct PhotographicJarScene: View {
                 }
             }
             .frame(width: width, height: height)
-            .mask(
-                JarInteriorFloorMask()
-                    .fill(.white)
-                    .blur(radius: 18 * scale)
-                    .frame(width: width, height: height)
-            )
 
             Image("JarGlassFront")
                 .resizable()
                 .frame(width: width, height: height)
-                .allowsHitTesting(false)
-
-            Ellipse()
-                .fill(.black.opacity(0.15))
-                .frame(width: 500 * scale, height: 42 * scale)
-                .blur(radius: 17 * scale)
-                .position(x: 470 * scale, y: 1283 * scale)
+                .mask(
+                    JarForegroundGlassMask()
+                        .fill(style: FillStyle(eoFill: true))
+                        .blur(radius: 14 * scale)
+                        .frame(width: width, height: height)
+                )
                 .allowsHitTesting(false)
 
             LinearGradient(
@@ -310,22 +303,20 @@ struct PhotographicJarScene: View {
     }
 }
 
-/// The front half of the thick glass base must hide any nut silhouette that
-/// passes below the inner floor. The curve follows the jar's photographed oval.
-private struct JarInteriorFloorMask: Shape {
+/// The photographed bottom is already in JarEmptyBase behind the acorns. Keep
+/// the front rim and side refractions, but leave the central inner floor clear
+/// so the nuts sit visibly *on* that surface instead of behind another copy.
+private struct JarForegroundGlassMask: Shape {
     func path(in rect: CGRect) -> Path {
         let scale = rect.width / 941
         var path = Path()
-        path.move(to: .zero)
-        path.addLine(to: CGPoint(x: rect.width, y: 0))
-        for step in stride(from: 941, through: 0, by: -5) {
-            let x = CGFloat(step)
-            let distance = x - 470
-            let floorY = 1284 - 0.00055 * distance * distance
-            path.addLine(to: CGPoint(x: x * scale, y: floorY * scale))
-        }
-        path.addLine(to: CGPoint(x: 0, y: (1284 - 0.00055 * 470 * 470) * scale))
-        path.closeSubpath()
+        path.addRect(rect)
+        path.addEllipse(in: CGRect(
+            x: 165 * scale,
+            y: 1215 * scale,
+            width: 610 * scale,
+            height: 170 * scale
+        ))
         return path
     }
 }
