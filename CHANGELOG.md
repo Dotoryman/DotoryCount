@@ -2,6 +2,13 @@
 
 All notable changes to DotoryCount are recorded in this file.
 
+## [0.4.1] - 2026-09-24
+
+- Keep the iPhone experience in portrait, where the photographic jar and date
+  card have the intended spacing. This prevents overlap while the device is
+  held sideways.
+- Bumped the app to version 0.4.1 (build 9).
+
 ## [0.4.0] - 2026-09-24
 
 - Replaced the fixed home-screen film with an icon-matched glass jar assembled from
