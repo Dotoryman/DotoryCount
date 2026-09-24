@@ -15,6 +15,24 @@ final class DotoryCountUITests: XCTestCase {
     }
 
     @MainActor
+    func testChooseStartDateWithQuickPreset() throws {
+        let app = launchApp()
+        app.buttons["create-anniversary-button"].tap()
+
+        let dateButton = app.buttons["anniversary-date-picker"]
+        XCTAssertTrue(dateButton.waitForExistence(timeout: 3))
+        dateButton.tap()
+        XCTAssertTrue(app.datePickers["anniversary-graphical-date-picker"].waitForExistence(timeout: 3))
+
+        app.buttons["직접 입력"].tap()
+        let dateField = app.textFields["anniversary-direct-date-field"]
+        XCTAssertTrue(dateField.waitForExistence(timeout: 3))
+        app.buttons["어제"].tap()
+        app.buttons["apply-anniversary-date-button"].tap()
+        XCTAssertTrue(dateButton.label.contains(String(Calendar.current.component(.year, from: .now))))
+    }
+
+    @MainActor
     func testDeleteAnniversaryFlow() throws {
         let app = launchApp()
         createAnniversary(in: app)

@@ -26,33 +26,64 @@ enum PhotographicJarStages {
     struct Placement: Equatable {
         let x: CGFloat
         let y: CGFloat
+        let radius: CGFloat
         let size: CGFloat
         let angle: Double
+        let variant: Int
+        let depth: CGFloat
     }
 
-    // The glass is 941 × 1672. Positions are in that artboard's coordinates.
-    // Each row sits partly behind the row above it, with deterministic variation.
+    // Drop differently sized disks into a shallow curved jar floor. Each disk
+    // rests on the floor or a previously settled disk, rather than a fixed row.
+    // The glass is 941 × 1672; all coordinates use that artboard.
     static let placements: [Placement] = {
-        let rowCounts = [7, 7, 6, 6, 5, 5]
         var result: [Placement] = []
-        for (row, count) in rowCounts.enumerated() {
-            let spacing: CGFloat = row < 2 ? 75 : 82
-            let order = (0..<count).sorted {
-                abs(CGFloat($0) - CGFloat(count - 1) / 2) < abs(CGFloat($1) - CGFloat(count - 1) / 2)
+        for index in 0..<maximumStage {
+            // The PNGs include soft transparent edges. Their visible bodies are
+            // smaller than their frames, so a tighter collision hull lets the
+            // silhouettes touch like objects in a real pile.
+            let radius = 36 + noise(index, salt: 29) * 4
+            let preferredX = 470 + noise(index, salt: 11) * 225
+            var bestX: CGFloat = 470
+            var bestY: CGFloat = 0
+            var bestScore = -CGFloat.infinity
+
+            for step in 0...102 {
+                let x = CGFloat(215 + step * 5)
+                let distanceFromCenter = x - 470
+                let floorY = 1290 - 0.00065 * distanceFromCenter * distanceFromCenter
+                var y = floorY - radius
+
+                for previous in result {
+                    let dx = x - previous.x
+                    let clearance = radius + previous.radius
+                    if abs(dx) < clearance {
+                        let contactRise = sqrt(clearance * clearance - dx * dx)
+                        y = min(y, previous.y - contactRise)
+                    }
+                }
+
+                // Gravity dominates, with a small deterministic preference for
+                // different landing sides so the pile is not mirror-symmetric.
+                let score = y - abs(x - preferredX) * 0.045
+                if score > bestScore {
+                    bestScore = score
+                    bestX = x
+                    bestY = y
+                }
             }
-            for slot in order {
-                let index = result.count
-                let xNoise = noise(index, salt: 11) * 21
-                let yNoise = noise(index, salt: 47) * 20
-                let angle = Double(noise(index, salt: 83) * 112)
-                let size = 210 + noise(index, salt: 29) * 20
-                result.append(Placement(
-                    x: 470 + (CGFloat(slot) - CGFloat(count - 1) / 2) * spacing + xNoise,
-                    y: 1195 - CGFloat(row) * 86 + yNoise,
-                    size: size,
-                    angle: angle
-                ))
-            }
+
+            let variant = min(Int((noise(index, salt: 153) + 1) * 1.5), 2)
+            let depth = noise(index, salt: 79)
+            result.append(Placement(
+                x: bestX,
+                y: bestY,
+                radius: radius,
+                size: variant == 0 ? 190 : 148,
+                angle: Double(noise(index, salt: 83) * 155),
+                variant: variant,
+                depth: depth
+            ))
         }
         return result
     }()
@@ -104,12 +135,27 @@ struct PhotographicJarScene: View {
     }
 
     private func jarArtboard(width: CGFloat, height: CGFloat, scale: CGFloat) -> some View {
-        ZStack(alignment: .topLeading) {
+        let settledIndices = (0..<max(stage - 1, 0)).sorted {
+            PhotographicJarStages.placements[$0].depth < PhotographicJarStages.placements[$1].depth
+        }
+        return ZStack(alignment: .topLeading) {
             Image("JarEmptyBase")
                 .resizable()
                 .frame(width: width, height: height)
 
-            ForEach(0..<max(stage - 1, 0), id: \.self) { index in
+            Ellipse()
+                .fill(.black.opacity(0.20))
+                .frame(width: 510 * scale, height: 108 * scale)
+                .blur(radius: 31 * scale)
+                .position(x: 470 * scale, y: 1282 * scale)
+
+            Ellipse()
+                .fill(.brown.opacity(0.08))
+                .frame(width: 570 * scale, height: 440 * scale)
+                .blur(radius: 54 * scale)
+                .position(x: 470 * scale, y: 1130 * scale)
+
+            ForEach(settledIndices, id: \.self) { index in
                 acorn(at: PhotographicJarStages.placements[index],
                       golden: isGolden(index: index), scale: scale)
             }
@@ -132,6 +178,16 @@ struct PhotographicJarScene: View {
                 .resizable()
                 .frame(width: width, height: height)
                 .allowsHitTesting(false)
+
+            LinearGradient(
+                colors: [.clear, .white.opacity(0.035), .cyan.opacity(0.07)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(width: 625 * scale, height: 570 * scale)
+            .clipShape(RoundedRectangle(cornerRadius: 72 * scale))
+            .position(x: 470 * scale, y: 1000 * scale)
+            .allowsHitTesting(false)
         }
         .frame(width: width, height: height)
     }
@@ -143,16 +199,30 @@ struct PhotographicJarScene: View {
         offset: CGSize = .zero,
         extraRotation: Double = 0
     ) -> some View {
-        Image(golden ? "GoldenAcornSprite" : "AcornSprite")
-            .resizable()
-            .scaledToFit()
-            .frame(width: placement.size * scale, height: placement.size * scale)
-            .rotationEffect(.degrees(placement.angle + extraRotation))
-            .shadow(color: .brown.opacity(0.25), radius: 4 * scale, y: 5 * scale)
-            .position(
-                x: (placement.x + offset.width) * scale,
-                y: (placement.y + offset.height) * scale
-            )
+        let centerX = (placement.x + offset.width) * scale
+        let centerY = (placement.y + offset.height) * scale
+        let imageName = golden ? "GoldenAcornSprite" :
+            (placement.variant == 0 ? "AcornSprite" : placement.variant == 1 ? "AcornSide" : "AcornBack")
+
+        return ZStack(alignment: .topLeading) {
+            Ellipse()
+                .fill(.black.opacity(0.19 + 0.08 * Double(placement.depth + 1) / 2))
+                .frame(width: placement.radius * 2.3 * scale, height: placement.radius * 0.9 * scale)
+                .blur(radius: 9 * scale)
+                .position(x: centerX + 6 * scale, y: centerY + 24 * scale)
+
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(
+                    width: (golden ? 160 : placement.size) * scale,
+                    height: (golden ? 160 : placement.size) * scale
+                )
+                .rotationEffect(.degrees(placement.angle + extraRotation))
+                .brightness(Double(placement.depth) * 0.045)
+                .shadow(color: .black.opacity(0.30), radius: 5 * scale, x: 3 * scale, y: 6 * scale)
+                .position(x: centerX, y: centerY)
+        }
     }
 
     private func isGolden(index: Int) -> Bool {

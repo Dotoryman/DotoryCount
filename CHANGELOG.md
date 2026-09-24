@@ -2,7 +2,7 @@
 
 All notable changes to DotoryCount are recorded in this file.
 
-## [Unreleased] - 0.4.0 device preview
+## [0.4.0] - 2026-09-24
 
 - Replaced the fixed home-screen film with an icon-matched glass jar assembled from
   a photographic empty jar, glass foreground, and individual acorn artwork.
@@ -13,8 +13,13 @@ All notable changes to DotoryCount are recorded in this file.
 - Moved the jar above the supporting date panel so the two no longer overlap.
 - Kept exact anniversary dates, milestones, and local SwiftData records intact.
 - Kept tap, app-open, and return-to-home replay with a Reduced Motion still scene.
-- The photographic composition is still a device preview; material and motion
-  polish will be reviewed before an official 0.4.0 release.
+- Replaced uniform rows with deterministic curved-floor collision placement.
+- Added side/back acorn views, varied resting angles, contact shadows, a base
+  shadow, softer depth shading, and correctly scaled golden acorns.
+- Reworked the base-date control into a dedicated calendar sheet with direct
+  date entry and quick presets for today, yesterday, and one year ago.
+- Added unit coverage for stable non-overlapping placement and date parsing.
+- Bumped the app to version 0.4.0 (build 8).
 
 ## [0.3.1] - 2026-09-20
 

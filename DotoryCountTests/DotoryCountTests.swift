@@ -166,8 +166,27 @@ struct DotoryCountTests {
         #expect(placements.count == 36)
         #expect(Set(placements.map { Int($0.angle / 15) }).count > 5)
         #expect(placements.allSatisfy {
-            $0.x - $0.size / 2 > 90 && $0.x + $0.size / 2 < 850
-                && $0.y - $0.size / 2 > 620 && $0.y + $0.size / 2 < 1350
+            $0.x - $0.radius > 160 && $0.x + $0.radius < 780
+                && $0.y - $0.radius > 630 && $0.y + $0.radius < 1330
         })
+        for first in placements.indices {
+            for second in placements.indices where second > first {
+                let dx = placements[first].x - placements[second].x
+                let dy = placements[first].y - placements[second].y
+                let clearance = placements[first].radius + placements[second].radius
+                #expect(dx * dx + dy * dy >= clearance * clearance - 1)
+            }
+        }
+        #expect(Set(placements.map(\.variant)) == Set([0, 1, 2]))
+    }
+
+    @Test("직접 입력 날짜는 숫자와 구분자를 받고 존재하지 않는 날짜는 거부한다")
+    func directDateInput() throws {
+        let leapDate = try #require(StartDateInput.parse("2020.02.29", calendar: calendar))
+        #expect(StartDateInput.format(leapDate, calendar: calendar) == "2020.02.29")
+        #expect(StartDateInput.parse("20200229", calendar: calendar) == leapDate)
+        #expect(StartDateInput.parse("2021.02.29", calendar: calendar) == nil)
+        #expect(StartDateInput.parse("2026.13.01", calendar: calendar) == nil)
+        #expect(StartDateInput.parse("2026.09", calendar: calendar) == nil)
     }
 }
