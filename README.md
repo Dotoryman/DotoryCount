@@ -1,63 +1,13 @@
 # DotoryCount
 
-하루마다 유리병에 도토리 하나를 쌓아 소중한 시간을 기록하는 SwiftUI 앱입니다.
+하루마다 유리병에 도토리 하나를 쌓아 소중한 시간을 기록하는 iOS 앱입니다.
 
-## v0.4.0
+An iOS app that records meaningful time by adding one acorn to a jar each day.
 
-- 앱 아이콘과 같은 재질의 유리병 안에 도토리가 쌓이는 홈 화면
-- 앞·옆·뒷면 도토리를 36단계로 안정적으로 배치하고 접촉·바닥 그림자와 유리 반사광 적용
-- 병 입구를 통과하는 낙하 모션을 화면 탭, 앱 실행, 화면 복귀 때 다시 재생
-- 기준일은 달력, 직접 입력, 오늘·어제·1년 전 빠른 선택으로 설정
-- 실제 경과일·황금도토리·로컬 저장 기록은 그대로 유지
+**언어 및 기술 · Languages & Technologies:** Swift · SwiftUI · SwiftData
 
-## v0.3.1
+v0.4.0: 사실적인 36단계 도토리 병, 낙하 애니메이션, 편리해진 기준일 선택.
 
-- 화면 어디를 탭해도 마지막 도토리가 병 안으로 다시 떨어지는 애니메이션
-- 앱 실행·백그라운드 복귀·편집 및 기념일 화면에서 돌아올 때 자동 낙하
-- 원본 비율을 유지해 찌그러지지 않는 도토리 이미지
-- 간격, 회전과 겹침을 다듬은 더 자연스러운 도토리 적층
+v0.4.0: A 36-stage photographic jar, animated acorn drops, and easier date selection.
 
-## v0.3.0
-
-- 앱 아이콘과 같은 사실적인 도토리·황금도토리 이미지
-- 처음 14일은 하루 단위, 이후에는 7일 단위로 촘촘하게 변하는 병
-- 정확한 실제 경과일을 유지하면서 한 병에 최대 약 64개의 큰 도토리를 표시
-- 100일 단위와 매년 주년을 황금도토리로 기록
-- 오늘의 축하 배너와 황금도토리 상세 화면
-- 더 깊어진 유리 테두리, 반사광, 굴절과 바닥 표현
-
-## v0.1 milestone
-
-- 기념일 이름과 기준일 저장
-- D+ / D- 계산
-- 1주년마다 가득 찬 유리병 보관
-- 현재 연도의 도토리를 Canvas로 표시
-- 다음 100일 또는 주년 안내
-- Swift Testing 단위 테스트와 XCTest UI 테스트
-
-## v0.2.0
-
-- 하루에 한 번 오늘의 도토리가 병 안으로 떨어지는 애니메이션
-- 구간이 늘어나도 기존 위치가 흔들리지 않는 자연스러운 도토리 적층
-- 도토리 형태, 유리 질감과 그림자 개선
-- 다크 모드와 `동작 줄이기` 지원
-- 병 배치 단위 테스트와 채워진 병 UI 테스트
-
-## v0.1.1
-
-- 유리병에 쌓이는 도토리 앱 아이콘
-- 기념일 삭제 및 확인 절차
-- 저장 실패 안내와 입력 길이 검증
-- 실제 iPhone 설치 및 실행 검증
-- GitHub Actions 자동 빌드 및 단위 테스트
-
-자세한 변경 사항은 [CHANGELOG.md](CHANGELOG.md)에서 확인할 수 있습니다.
-
-1.0 출시까지의 계획은 [ROADMAP.md](ROADMAP.md)에서 확인할 수 있습니다.
-
-## Development
-
-- Xcode 26.6+
-- SwiftUI + SwiftData
-- Minimum deployment target: iOS 17
-- Bundle identifier: `com.dotoryman.dotorycount`
+[변경 이력 · Changelog](CHANGELOG.md) · [개발 계획 · Roadmap](ROADMAP.md)
