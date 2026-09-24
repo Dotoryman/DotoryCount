@@ -2,6 +2,14 @@
 
 All notable changes to DotoryCount are recorded in this file.
 
+## [0.4.2] - 2026-09-24
+
+- Keep the photographed glass floor behind the acorns while retaining the
+  front rim and side reflections. A softly feathered oval removes only the
+  foreground floor overlay that made acorns appear behind the base.
+- Add a contact shadow along the inner floor to ground sparse and full piles.
+- Bumped the app to version 0.4.2 (build 10).
+
 ## [0.4.1] - 2026-09-24
 
 - Keep the iPhone experience in portrait, where the photographic jar and date
