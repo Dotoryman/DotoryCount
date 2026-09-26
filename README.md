@@ -6,8 +6,8 @@ An iOS app that records meaningful time by adding one acorn to a jar each day.
 
 **언어 및 기술 · Languages & Technologies:** Swift · SwiftUI · SwiftData
 
-v0.4.2: 사실적인 36단계 도토리 병, 자연스러운 유리 바닥 깊이, 낙하 애니메이션, 편리해진 기준일 선택. 아이폰은 세로 화면에 맞춰 표시됩니다.
+v0.5.0: iOS 26 이상에서 Liquid Glass 조작부와 정보 패널을 적용하고, 잠금화면 직사각형 위젯 및 사진형 도토리 병 홈 화면 위젯을 추가했습니다.
 
-v0.4.2: A 36-stage photographic jar with grounded acorns, animated drops, easier date selection, and a portrait iPhone layout.
+v0.5.0: Adds Liquid Glass controls on iOS 26+, a rectangular Lock Screen widget, and a photographic acorn-jar Home Screen widget.
 
 [변경 이력 · Changelog](CHANGELOG.md) · [개발 계획 · Roadmap](ROADMAP.md)

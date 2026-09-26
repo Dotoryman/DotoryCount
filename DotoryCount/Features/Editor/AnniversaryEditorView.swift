@@ -131,14 +131,19 @@ struct AnniversaryEditorView: View {
 
     private func save() {
         do {
+            let savedAnniversary: Anniversary
             if let anniversary {
                 anniversary.title = trimmedTitle
                 anniversary.startDate = startDate
+                savedAnniversary = anniversary
             } else {
-                modelContext.insert(Anniversary(title: trimmedTitle, startDate: startDate))
+                let newAnniversary = Anniversary(title: trimmedTitle, startDate: startDate)
+                modelContext.insert(newAnniversary)
+                savedAnniversary = newAnniversary
             }
 
             try modelContext.save()
+            WidgetSnapshotStore.publish(savedAnniversary)
             dismiss()
         } catch {
             modelContext.rollback()
@@ -153,6 +158,7 @@ struct AnniversaryEditorView: View {
         do {
             modelContext.delete(anniversary)
             try modelContext.save()
+            WidgetSnapshotStore.publish(nil)
             dismiss()
         } catch {
             modelContext.rollback()

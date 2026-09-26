@@ -2,6 +2,16 @@
 
 All notable changes to DotoryCount are recorded in this file.
 
+## [0.5.0] - 2026-09-26
+
+- Apply Liquid Glass to the dashboard action and information panel on iOS 26+,
+  with material fallbacks on older supported iOS versions.
+- Add a compact rectangular Lock Screen day counter and a small Home Screen
+  widget with the photographic jar, staged acorn pile, and D+ counter.
+- Share the current anniversary summary with WidgetKit and refresh its timeline
+  after edits, deletion, and the next calendar day.
+- Bumped the app and widget to version 0.5.0 (build 11).
+
 ## [0.4.2] - 2026-09-24
 
 - Keep the photographed glass floor behind the acorns while retaining the
