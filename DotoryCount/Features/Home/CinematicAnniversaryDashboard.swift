@@ -96,8 +96,8 @@ struct CinematicAnniversaryDashboard: View {
                 Image(systemName: "ellipsis")
                     .font(.system(size: 19, weight: .medium))
                     .frame(width: 42, height: 42)
-                    .background(.white.opacity(0.86), in: Circle())
             }
+            .modifier(GlassActionStyle())
             .accessibilityLabel("기념일 수정")
             .accessibilityIdentifier("edit-anniversary-button")
         }
@@ -134,7 +134,7 @@ struct CinematicAnniversaryDashboard: View {
                 .foregroundStyle(AppTheme.secondaryText)
         }
         .padding(15)
-        .background(.white.opacity(0.88), in: RoundedRectangle(cornerRadius: 19))
+        .modifier(GlassInformationPanel())
     }
 
     private func replay() {

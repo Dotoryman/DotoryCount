@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D05000000000000000000001 /* DotoryCountWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = D05000000000000000000002 /* DotoryCountWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		D0500000000000000000000B /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A607FF8D3055937D00D23132 /* Project object */; proxyType = 1; remoteGlobalIDString = D05000000000000000000005; remoteInfo = DotoryCountWidget; };
 		A607FFA33055937F00D23132 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A607FF8D3055937D00D23132 /* Project object */;
@@ -23,13 +28,19 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		D05000000000000000000008 /* Embed App Extensions */ = {isa = PBXCopyFilesBuildPhase; buildActionMask = 2147483647; dstPath = ""; dstSubfolderSpec = 13; files = (D05000000000000000000001 /* DotoryCountWidget.appex in Embed App Extensions */); name = "Embed App Extensions"; runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		D05000000000000000000002 /* DotoryCountWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DotoryCountWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A607FF953055937D00D23132 /* DotoryCount.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DotoryCount.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A607FFA23055937F00D23132 /* DotoryCountTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DotoryCountTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A607FFAC3055937F00D23132 /* DotoryCountUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DotoryCountUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		D05000000000000000000003 /* DotoryCountWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; path = DotoryCountWidget; sourceTree = "<group>"; };
 		A607FF973055937D00D23132 /* DotoryCount */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = DotoryCount;
@@ -48,6 +59,7 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		D05000000000000000000004 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 		A607FF923055937D00D23132 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -76,6 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				A607FF973055937D00D23132 /* DotoryCount */,
+				D05000000000000000000003 /* DotoryCountWidget */,
 				A607FFA53055937F00D23132 /* DotoryCountTests */,
 				A607FFAF3055937F00D23132 /* DotoryCountUITests */,
 				A607FF963055937D00D23132 /* Products */,
@@ -86,6 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				A607FF953055937D00D23132 /* DotoryCount.app */,
+				D05000000000000000000002 /* DotoryCountWidget.appex */,
 				A607FFA23055937F00D23132 /* DotoryCountTests.xctest */,
 				A607FFAC3055937F00D23132 /* DotoryCountUITests.xctest */,
 			);
@@ -95,6 +109,19 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		D05000000000000000000005 /* DotoryCountWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D05000000000000000000009 /* Build configuration list for PBXNativeTarget "DotoryCountWidget" */;
+			buildPhases = (D05000000000000000000006 /* Sources */, D05000000000000000000004 /* Frameworks */, D05000000000000000000007 /* Resources */);
+			buildRules = ();
+			dependencies = ();
+			fileSystemSynchronizedGroups = (D05000000000000000000003 /* DotoryCountWidget */);
+			name = DotoryCountWidget;
+			packageProductDependencies = ();
+			productName = DotoryCountWidget;
+			productReference = D05000000000000000000002 /* DotoryCountWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		A607FF943055937D00D23132 /* DotoryCount */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A607FFB63055937F00D23132 /* Build configuration list for PBXNativeTarget "DotoryCount" */;
@@ -102,11 +129,11 @@
 				A607FF913055937D00D23132 /* Sources */,
 				A607FF923055937D00D23132 /* Frameworks */,
 				A607FF933055937D00D23132 /* Resources */,
+				D05000000000000000000008 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
-			dependencies = (
-			);
+			dependencies = (D0500000000000000000000A /* PBXTargetDependency */);
 			fileSystemSynchronizedGroups = (
 				A607FF973055937D00D23132 /* DotoryCount */,
 			);
@@ -173,6 +200,7 @@
 				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
+					D05000000000000000000005 = { CreatedOnToolsVersion = 26.6; };
 					A607FF943055937D00D23132 = {
 						CreatedOnToolsVersion = 26.6;
 					};
@@ -201,6 +229,7 @@
 			projectRoot = "";
 			targets = (
 				A607FF943055937D00D23132 /* DotoryCount */,
+				D05000000000000000000005 /* DotoryCountWidget */,
 				A607FFA13055937F00D23132 /* DotoryCountTests */,
 				A607FFAB3055937F00D23132 /* DotoryCountUITests */,
 			);
@@ -208,6 +237,7 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		D05000000000000000000007 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 		A607FF933055937D00D23132 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -232,6 +262,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		D05000000000000000000006 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 		A607FF913055937D00D23132 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -256,6 +287,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		D0500000000000000000000A /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = D05000000000000000000005 /* DotoryCountWidget */; targetProxy = D0500000000000000000000B /* PBXContainerItemProxy */; };
 		A607FFA43055937F00D23132 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A607FF943055937D00D23132 /* DotoryCount */;
@@ -269,6 +301,38 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		D0500000000000000000000C /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {
+			APPLICATION_EXTENSION_API_ONLY = YES;
+			CODE_SIGN_ENTITLEMENTS = DotoryCountWidget/DotoryCountWidget.entitlements;
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 11;
+			DEVELOPMENT_TEAM = W395S42ZJ9;
+			GENERATE_INFOPLIST_FILE = NO;
+			INFOPLIST_FILE = Configuration/WidgetInfo.plist;
+			IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+			MARKETING_VERSION = 0.5.0;
+			PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount.widget;
+			PRODUCT_NAME = "$(TARGET_NAME)";
+			SKIP_INSTALL = YES;
+			SWIFT_VERSION = 5.0;
+			TARGETED_DEVICE_FAMILY = 1;
+		}; name = Debug; };
+		D0500000000000000000000D /* Release */ = {isa = XCBuildConfiguration; buildSettings = {
+			APPLICATION_EXTENSION_API_ONLY = YES;
+			CODE_SIGN_ENTITLEMENTS = DotoryCountWidget/DotoryCountWidget.entitlements;
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 11;
+			DEVELOPMENT_TEAM = W395S42ZJ9;
+			GENERATE_INFOPLIST_FILE = NO;
+			INFOPLIST_FILE = Configuration/WidgetInfo.plist;
+			IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+			MARKETING_VERSION = 0.5.0;
+			PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount.widget;
+			PRODUCT_NAME = "$(TARGET_NAME)";
+			SKIP_INSTALL = YES;
+			SWIFT_VERSION = 5.0;
+			TARGETED_DEVICE_FAMILY = 1;
+		}; name = Release; };
 		A607FFB43055937F00D23132 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -393,10 +457,11 @@
 		A607FFB73055937F00D23132 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DotoryCount/DotoryCount.entitlements;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = W395S42ZJ9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -409,7 +474,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.4.2;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -425,10 +490,11 @@
 		A607FFB83055937F00D23132 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DotoryCount/DotoryCount.entitlements;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = W395S42ZJ9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -441,7 +507,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.4.2;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -537,6 +603,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		D05000000000000000000009 /* Build configuration list for PBXNativeTarget "DotoryCountWidget" */ = {isa = XCConfigurationList; buildConfigurations = (D0500000000000000000000C /* Debug */, D0500000000000000000000D /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 		A607FF903055937D00D23132 /* Build configuration list for PBXProject "DotoryCount" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

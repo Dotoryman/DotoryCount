@@ -34,6 +34,16 @@ struct HomeView: View {
             guard previousSheet != nil, currentSheet == nil else { return }
             dashboardReplayToken &+= 1
         }
+        .onAppear { WidgetSnapshotStore.publish(anniversaries.first) }
+        .onChange(of: anniversaries.count) { _, _ in
+            WidgetSnapshotStore.publish(anniversaries.first)
+        }
+        .onChange(of: anniversaries.first?.startDate) { _, _ in
+            WidgetSnapshotStore.publish(anniversaries.first)
+        }
+        .onChange(of: anniversaries.first?.title) { _, _ in
+            WidgetSnapshotStore.publish(anniversaries.first)
+        }
     }
 }
 
@@ -84,7 +94,7 @@ private struct EmptyAnniversaryView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
             }
-            .buttonStyle(.borderedProminent)
+            .modifier(GlassPrimaryActionStyle())
             .buttonBorderShape(.roundedRectangle(radius: 16))
             .accessibilityIdentifier("create-anniversary-button")
 

@@ -70,7 +70,7 @@ struct StartDateSelectionSheet: View {
                         preset("어제", daysAgo: 1)
                         preset("1년 전", yearsAgo: 1)
                     }
-                    .buttonStyle(.bordered)
+                    .modifier(GlassSecondaryActionStyle())
                     .listRowBackground(Color.clear)
                 }
 
