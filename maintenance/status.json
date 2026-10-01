@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "repository": "Dotoryman/DotoryCount",
+  "project_kind": "ios",
+  "checked_date_kst": "2026-10-01",
+  "checked_at_utc": "2026-10-01T00:10:45.377Z",
+  "default_branch": "main",
+  "inspected_commit": "177beadbec3c1b855d33a47cee5fa4b15ac7b707",
+  "workflow_run": "https://github.com/Dotoryman/DotoryCount/actions/runs/36794832214",
+  "inventory": {
+    "tracked_project_files": 72,
+    "tracked_project_bytes": 12686031,
+    "content_sha256": "9c96d313033b3ccaab7739dc4a910f4122ed12f5d2c562fefe1c3dcad81539cb",
+    "swift_files": 18,
+    "unit_test_files": 1,
+    "ui_test_files": 2,
+    "widget_swift_files": 1,
+    "asset_catalog_entries": 15,
+    "xcode": {
+      "marketing_versions": [
+        "0.4.2",
+        "0.5.0"
+      ],
+      "build_numbers": [
+        "10",
+        "11"
+      ],
+      "deployment_targets": [
+        "17.0"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "name": "README present and nonempty",
+      "passed": true,
+      "details": "Tracked README.md"
+    },
+    {
+      "name": "Asset catalog: DotoryCount/Assets.xcassets/AccentColor.colorset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCount/Assets.xcassets/AcornBack.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCount/Assets.xcassets/AcornSide.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCount/Assets.xcassets/AcornSprite.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCount/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCount/Assets.xcassets/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCount/Assets.xcassets/GoldenAcornSprite.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCount/Assets.xcassets/JarEmptyBase.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCount/Assets.xcassets/JarGlassFront.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCount/Assets.xcassets/JarPreviewStill.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCountWidget/Assets.xcassets/AcornSide.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCountWidget/Assets.xcassets/AcornSprite.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCountWidget/Assets.xcassets/GoldenAcornSprite.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCountWidget/Assets.xcassets/JarEmptyBase.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Asset catalog: DotoryCountWidget/Assets.xcassets/JarGlassFront.imageset/Contents.json",
+      "passed": true,
+      "details": {
+        "missing_files": []
+      }
+    },
+    {
+      "name": "Swift source and unit tests present",
+      "passed": true,
+      "details": "Inventory only; Xcode build and tests were not run."
+    },
+    {
+      "name": "Xcode build settings present",
+      "passed": true,
+      "details": {
+        "marketing_versions": [
+          "0.4.2",
+          "0.5.0"
+        ],
+        "build_numbers": [
+          "10",
+          "11"
+        ],
+        "deployment_targets": [
+          "17.0"
+        ]
+      }
+    }
+  ],
+  "result": "passed",
+  "scope": "Repository structure, manifest consistency and tracked asset references only. Application tests, builds, dependency vulnerability scans and live service availability are not assessed."
+}
