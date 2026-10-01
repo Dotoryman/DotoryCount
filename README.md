@@ -11,5 +11,3 @@ v0.5.0: iOS 26 이상에서 Liquid Glass 조작부와 정보 패널을 적용하
 v0.5.0: Adds Liquid Glass controls on iOS 26+, a rectangular Lock Screen widget, and a photographic acorn-jar Home Screen widget.
 
 [변경 이력 · Changelog](CHANGELOG.md) · [개발 계획 · Roadmap](ROADMAP.md)
-
-.
