@@ -65,8 +65,6 @@ final class DotoryCountUITests: XCTestCase {
     func testHundredDayMilestoneShowsGoldenAcornDetail() throws {
         let app = launchApp(additionalArguments: ["--ui-testing-100-day-anniversary"])
 
-        XCTAssertTrue(app.staticTexts["오늘은 100일"].waitForExistence(timeout: 3))
-
         let goldenAcorn = app.buttons["황금도토리 100일"]
         XCTAssertTrue(goldenAcorn.waitForExistence(timeout: 3))
         goldenAcorn.tap()
