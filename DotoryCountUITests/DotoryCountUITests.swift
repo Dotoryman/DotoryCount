@@ -59,6 +59,10 @@ final class DotoryCountUITests: XCTestCase {
         let jar = app.buttons["acorn-jar"]
         XCTAssertTrue(jar.waitForExistence(timeout: 3))
         XCTAssertTrue((jar.value as? String)?.contains("함께한 날 22일") == true)
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Object-first dashboard"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
     }
 
     @MainActor

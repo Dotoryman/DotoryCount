@@ -47,12 +47,22 @@ jobs:
           )"
           echo "SIMULATOR_ID=$simulator_id" >> "$GITHUB_ENV"
 
-      - name: Build and run unit tests
+      - name: Build and run unit and interaction tests
         run: |
           xcodebuild test \
             -project DotoryCount.xcodeproj \
             -scheme DotoryCount \
             -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
             -only-testing:DotoryCountTests \
+            -only-testing:DotoryCountUITests/DotoryCountUITests \
+            -resultBundlePath TestResults.xcresult \
             -parallel-testing-enabled NO \
             CODE_SIGNING_ALLOWED=NO
+
+      - name: Preserve test results and screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-test-results
+          path: TestResults.xcresult
+          retention-days: 7
