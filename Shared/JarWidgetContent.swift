@@ -20,13 +20,13 @@ struct JarWidgetContent: View {
                 Text(counter)
                     .font(.system(size: 14, weight: .medium, design: .rounded))
                     .monospacedDigit()
-                    .foregroundStyle(Color.primary)
+                    .foregroundStyle(Color(red: 0.24, green: 0.20, blue: 0.16))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                 if !isConfigured {
                     Text("기념일을 설정해 주세요")
                         .font(.system(size: 9))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color(red: 0.42, green: 0.38, blue: 0.33))
                         .lineLimit(1)
                 }
             }
