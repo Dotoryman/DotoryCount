@@ -24,63 +24,88 @@ struct AnniversaryEditorView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    TextField("이름", text: $title, prompt: Text("우리의 시작"))
-                        .textInputAutocapitalization(.sentences)
-                        .submitLabel(.done)
-                        .focused($isTitleFocused)
-                        .accessibilityIdentifier("anniversary-title-field")
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Image("AcornSprite").resizable().scaledToFit()
+                            .frame(width: 44, height: 44).accessibilityHidden(true)
+                        Text(anniversary == nil ? "어떤 날을 기억할까요?" : "우리의 시간을 다듬어요")
+                            .font(.system(.title2, design: .serif).weight(.medium))
+                        Text("이름과 시작한 날만 정하면 준비가 끝나요.")
+                            .font(.subheadline)
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
+                    .padding(.top, 8)
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        EditorialEyebrow(title: "기념일 이름")
+                        TextField("이름", text: $title, prompt: Text("우리의 시작"))
+                            .font(.title3.weight(.medium))
+                            .textInputAutocapitalization(.sentences)
+                            .submitLabel(.done)
+                            .focused($isTitleFocused)
+                            .onSubmit { isTitleFocused = false }
+                            .accessibilityIdentifier("anniversary-title-field")
+                        HStack {
+                            Text("짧고 소중한 이름을 붙여주세요.")
+                            Spacer()
+                            Text("\(title.count)/\(maximumTitleLength)")
+                                .monospacedDigit()
+                                .foregroundStyle(title.count > maximumTitleLength ? .red : AppTheme.secondaryText)
+                        }
+                        .font(.caption2)
+                        .foregroundStyle(AppTheme.secondaryText)
+                    }
+                    .padding(20)
+                    .modifier(PaperSurface())
 
                     Button {
                         isTitleFocused = false
                         dateSheet = .choose
                     } label: {
-                        HStack {
-                            Text("기준일")
-                                .foregroundStyle(.primary)
-                            Spacer()
-                            Text(startDate.formatted(date: .abbreviated, time: .omitted))
-                                .foregroundStyle(AppTheme.secondaryText)
+                        HStack(spacing: 14) {
+                            Image(systemName: "calendar")
+                                .font(.title3)
+                                .foregroundStyle(AppTheme.accent)
+                            VStack(alignment: .leading, spacing: 6) {
+                                EditorialEyebrow(title: "처음 시작한 날")
+                                Text(startDate.formatted(date: .long, time: .omitted))
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(AppTheme.ink)
+                            }
+                            Spacer(minLength: 4)
                             Image(systemName: "chevron.right")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(AppTheme.secondaryText)
                         }
-                        .contentShape(Rectangle())
+                        .padding(20)
+                        .frame(minHeight: 90)
+                        .modifier(PaperSurface())
+                        .contentShape(RoundedRectangle(cornerRadius: 24))
                     }
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("anniversary-date-picker")
-                } header: {
-                    Text("기념일")
-                } footer: {
-                    HStack {
-                        Text("이름은 30자까지 입력할 수 있어요.")
-                        Spacer()
-                        Text("\(title.count)/\(maximumTitleLength)")
-                            .monospacedDigit()
-                            .foregroundStyle(title.count > maximumTitleLength ? .red : AppTheme.secondaryText)
-                    }
-                }
 
-                Section {
-                    Text("입력한 날짜부터 하루마다 도토리가 하나씩 쌓입니다. 1주년마다 가득 찬 병을 보관하고 새 병을 시작해요.")
-                        .font(.footnote)
-                        .foregroundStyle(AppTheme.secondaryText)
-                }
+                    draftPreview
 
-                if anniversary != nil {
-                    Section {
+                    if anniversary != nil {
                         Button("기념일 삭제", role: .destructive) {
                             presentedAlert = .deleteConfirmation
                         }
+                        .font(.subheadline)
+                        .frame(maxWidth: .infinity, minHeight: 44)
                         .accessibilityIdentifier("delete-anniversary-button")
                         .accessibilityHint("저장된 기념일을 삭제하기 전에 확인합니다")
                     }
                 }
+                .padding(.horizontal, AppTheme.horizontalPadding)
+                .padding(.bottom, 30)
+                .frame(maxWidth: 520)
+                .frame(maxWidth: .infinity)
             }
-            .scrollContentBackground(.hidden)
-            .background(AppTheme.background)
             .scrollDismissesKeyboard(.interactively)
+            .background { PaperBackdrop() }
+            .foregroundStyle(AppTheme.ink)
             .navigationTitle(anniversary == nil ? "기념일 만들기" : "기념일 수정")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -91,11 +116,6 @@ struct AnniversaryEditorView: View {
                     Button("저장", action: save)
                         .disabled(!isTitleValid)
                         .accessibilityIdentifier("save-anniversary-button")
-                }
-            }
-            .task {
-                if anniversary == nil {
-                    isTitleFocused = true
                 }
             }
             .sheet(item: $dateSheet) { _ in
@@ -119,6 +139,29 @@ struct AnniversaryEditorView: View {
                 }
             }
         }
+    }
+
+    private var draftPreview: some View {
+        let progress = AnniversaryCalculator.progress(from: startDate)
+        return HStack(spacing: 18) {
+            JarArtworkView(progress: progress, viewport: .widget)
+                .frame(width: 74, height: 94)
+            VStack(alignment: .leading, spacing: 6) {
+                EditorialEyebrow(title: "이 병에 담길 시간")
+                Text(progress.counterText)
+                    .font(.system(.title2, design: .rounded).weight(.medium))
+                    .monospacedDigit()
+                Text(progress.isWaitingToStart
+                     ? "시작일까지 \(abs(progress.elapsedDays))일 남았어요."
+                     : "하루마다 하나씩, \(progress.completedJars + 1)번째 병에 담겨요.")
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.vertical, 6)
+        .accessibilityElement(children: .combine)
     }
 
     private var trimmedTitle: String {
