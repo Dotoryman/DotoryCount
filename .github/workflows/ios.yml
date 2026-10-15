@@ -12,15 +12,17 @@ permissions:
 jobs:
   build-and-test:
     name: Build and test
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 30
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
 
-      - name: Select Xcode 26.6
-        run: sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
+      - name: Verify Xcode 27 toolchain
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks
 
       - name: Select an available iPhone simulator
         shell: bash
@@ -33,23 +35,34 @@ jobs:
           runtimes = json.load(sys.stdin)["devices"]
           iphones = [
               device
-              for devices in runtimes.values()
+              for runtime, devices in runtimes.items()
+              if "iOS-27" in runtime
               for device in devices
               if device["name"].startswith("iPhone") and device["isAvailable"]
           ]
           if not iphones:
-              raise SystemExit("No available iPhone simulator found")
+              raise SystemExit("No available iOS 27 iPhone simulator found")
           print(iphones[0]["udid"])
           '
           )"
           echo "SIMULATOR_ID=$simulator_id" >> "$GITHUB_ENV"
 
-      - name: Build and run unit tests
+      - name: Build and run unit and interaction tests
         run: |
           xcodebuild test \
             -project DotoryCount.xcodeproj \
             -scheme DotoryCount \
             -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
             -only-testing:DotoryCountTests \
+            -only-testing:DotoryCountUITests/DotoryCountUITests \
+            -resultBundlePath TestResults.xcresult \
             -parallel-testing-enabled NO \
             CODE_SIGNING_ALLOWED=NO
+
+      - name: Preserve test results and screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-test-results
+          path: TestResults.xcresult
+          retention-days: 7

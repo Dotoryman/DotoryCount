@@ -40,6 +40,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		D06000000000000000000001 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; path = Shared; sourceTree = "<group>"; };
 		D05000000000000000000003 /* DotoryCountWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; path = DotoryCountWidget; sourceTree = "<group>"; };
 		A607FF973055937D00D23132 /* DotoryCount */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -89,6 +90,7 @@
 			children = (
 				A607FF973055937D00D23132 /* DotoryCount */,
 				D05000000000000000000003 /* DotoryCountWidget */,
+				D06000000000000000000001 /* Shared */,
 				A607FFA53055937F00D23132 /* DotoryCountTests */,
 				A607FFAF3055937F00D23132 /* DotoryCountUITests */,
 				A607FF963055937D00D23132 /* Products */,
@@ -115,7 +117,7 @@
 			buildPhases = (D05000000000000000000006 /* Sources */, D05000000000000000000004 /* Frameworks */, D05000000000000000000007 /* Resources */);
 			buildRules = ();
 			dependencies = ();
-			fileSystemSynchronizedGroups = (D05000000000000000000003 /* DotoryCountWidget */);
+			fileSystemSynchronizedGroups = (D05000000000000000000003 /* DotoryCountWidget */, D06000000000000000000001 /* Shared */);
 			name = DotoryCountWidget;
 			packageProductDependencies = ();
 			productName = DotoryCountWidget;
@@ -136,6 +138,7 @@
 			dependencies = (D0500000000000000000000A /* PBXTargetDependency */);
 			fileSystemSynchronizedGroups = (
 				A607FF973055937D00D23132 /* DotoryCount */,
+				D06000000000000000000001 /* Shared */,
 			);
 			name = DotoryCount;
 			packageProductDependencies = (
@@ -305,12 +308,12 @@
 			APPLICATION_EXTENSION_API_ONLY = YES;
 			CODE_SIGN_ENTITLEMENTS = DotoryCountWidget/DotoryCountWidget.entitlements;
 			CODE_SIGN_STYLE = Automatic;
-			CURRENT_PROJECT_VERSION = 11;
+			CURRENT_PROJECT_VERSION = 12;
 			DEVELOPMENT_TEAM = W395S42ZJ9;
 			GENERATE_INFOPLIST_FILE = NO;
 			INFOPLIST_FILE = Configuration/WidgetInfo.plist;
 			IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-			MARKETING_VERSION = 0.5.0;
+			MARKETING_VERSION = 0.6.0;
 			PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount.widget;
 			PRODUCT_NAME = "$(TARGET_NAME)";
 			SKIP_INSTALL = YES;
@@ -321,12 +324,12 @@
 			APPLICATION_EXTENSION_API_ONLY = YES;
 			CODE_SIGN_ENTITLEMENTS = DotoryCountWidget/DotoryCountWidget.entitlements;
 			CODE_SIGN_STYLE = Automatic;
-			CURRENT_PROJECT_VERSION = 11;
+			CURRENT_PROJECT_VERSION = 12;
 			DEVELOPMENT_TEAM = W395S42ZJ9;
 			GENERATE_INFOPLIST_FILE = NO;
 			INFOPLIST_FILE = Configuration/WidgetInfo.plist;
 			IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-			MARKETING_VERSION = 0.5.0;
+			MARKETING_VERSION = 0.6.0;
 			PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount.widget;
 			PRODUCT_NAME = "$(TARGET_NAME)";
 			SKIP_INSTALL = YES;
@@ -461,7 +464,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = W395S42ZJ9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -474,7 +477,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.5.0;
+				MARKETING_VERSION = 0.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -494,7 +497,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = W395S42ZJ9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -507,7 +510,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.5.0;
+				MARKETING_VERSION = 0.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -525,10 +528,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.4.2;
+				MARKETING_VERSION = 0.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -546,10 +549,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.4.2;
+				MARKETING_VERSION = 0.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -566,9 +569,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 0.4.2;
+				MARKETING_VERSION = 0.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -585,9 +588,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 0.4.2;
+				MARKETING_VERSION = 0.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dotoryman.dotorycount.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
