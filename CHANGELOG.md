@@ -2,6 +2,19 @@
 
 All notable changes to DotoryCount are recorded in this file.
 
+## [0.6.0] - 2026-10-04
+
+- Refine the app around a photographic jar exhibit, warm paper surfaces,
+  editorial typography, and quiet supporting day counts.
+- Reserve Liquid Glass for interactive controls; add adaptive dark appearance
+  and scrollable layouts for larger text.
+- Redesign anniversary editing with a live jar preview, calendar/direct date
+  entry, and quick date presets without automatically opening the keyboard.
+- Share the exact calendar calculation and jar artwork between app and widget;
+  schedule seven midnight widget updates for accurate future day counts.
+- Preserve existing local records, 36 fill stages, golden milestones, and replay.
+- Build with Xcode 27 / iOS 27 SDK; app and widget version 0.6.0 (build 12).
+
 ## [0.5.0] - 2026-09-26
 
 - Apply Liquid Glass to the dashboard action and information panel on iOS 26+,

@@ -3,16 +3,16 @@ import UIKit
 
 enum AppTheme {
     static let background = adaptive(
-        light: UIColor(red: 0.97, green: 0.95, blue: 0.90, alpha: 1),
-        dark: UIColor(red: 0.10, green: 0.085, blue: 0.07, alpha: 1)
+        light: UIColor(red: 0.982, green: 0.971, blue: 0.947, alpha: 1),
+        dark: UIColor(red: 0.105, green: 0.094, blue: 0.081, alpha: 1)
     )
     static let surface = adaptive(
-        light: UIColor(white: 1, alpha: 0.72),
-        dark: UIColor(red: 0.18, green: 0.16, blue: 0.13, alpha: 0.92)
+        light: UIColor(red: 1, green: 0.992, blue: 0.977, alpha: 1),
+        dark: UIColor(red: 0.17, green: 0.151, blue: 0.125, alpha: 1)
     )
     static let accent = adaptive(
-        light: UIColor(red: 0.43, green: 0.27, blue: 0.13, alpha: 1),
-        dark: UIColor(red: 0.83, green: 0.64, blue: 0.40, alpha: 1)
+        light: UIColor(red: 0.37, green: 0.25, blue: 0.16, alpha: 1),
+        dark: UIColor(red: 0.89, green: 0.73, blue: 0.53, alpha: 1)
     )
     static let acorn = adaptive(
         light: UIColor(red: 0.55, green: 0.32, blue: 0.13, alpha: 1),
@@ -35,10 +35,19 @@ enum AppTheme {
         light: UIColor(red: 0.78, green: 0.90, blue: 0.90, alpha: 1),
         dark: UIColor(red: 0.43, green: 0.62, blue: 0.64, alpha: 1)
     )
-    static let secondaryText = Color.primary.opacity(0.62)
+    static let ink = adaptive(
+        light: UIColor(red: 0.24, green: 0.20, blue: 0.16, alpha: 1),
+        dark: UIColor(red: 0.95, green: 0.91, blue: 0.85, alpha: 1)
+    )
+    static let secondaryText = adaptive(
+        light: UIColor(red: 0.49, green: 0.44, blue: 0.38, alpha: 1),
+        dark: UIColor(red: 0.71, green: 0.66, blue: 0.58, alpha: 1)
+    )
+    static let divider = ink.opacity(0.10)
+    static let gold = Color(red: 0.67, green: 0.47, blue: 0.19)
 
     static let cardCornerRadius: CGFloat = 24
-    static let horizontalPadding: CGFloat = 20
+    static let horizontalPadding: CGFloat = 26
 
     private static func adaptive(light: UIColor, dark: UIColor) -> Color {
         Color(uiColor: UIColor { traits in
