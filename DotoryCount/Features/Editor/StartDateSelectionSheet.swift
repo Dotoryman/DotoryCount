@@ -63,57 +63,80 @@ struct StartDateSelectionSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("빠른 선택") {
-                    HStack(spacing: 10) {
-                        preset("오늘", daysAgo: 0)
-                        preset("어제", daysAgo: 1)
-                        preset("1년 전", yearsAgo: 1)
-                    }
-                    .modifier(GlassSecondaryActionStyle())
-                    .listRowBackground(Color.clear)
-                }
-
-                Section {
-                    Picker("선택 방법", selection: $mode) {
-                        ForEach(DateChoiceMode.allCases, id: \.self) { choice in
-                            Text(choice.rawValue).tag(choice)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-
-                    if mode == .calendar {
-                        DatePicker("기준일", selection: $draftDate, displayedComponents: .date)
-                            .datePickerStyle(.graphical)
-                            .labelsHidden()
-                            .accessibilityIdentifier("anniversary-graphical-date-picker")
-                    } else {
-                        TextField("YYYY.MM.DD", text: $dateText)
-                            .keyboardType(.numbersAndPunctuation)
-                            .textContentType(.none)
-                            .focused($isDateTextFocused)
-                            .accessibilityIdentifier("anniversary-direct-date-field")
-                        Text("예: 2020.09.24 또는 20200924")
-                            .font(.footnote)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 22) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        EditorialEyebrow(title: "처음 시작한 날")
+                        Text(selectedDate?.formatted(date: .long, time: .omitted) ?? "날짜를 확인해 주세요")
+                            .font(.system(.title2, design: .serif).weight(.medium))
+                            .fixedSize(horizontal: false, vertical: true)
+                        Text("지난 날짜도, 앞으로 찾아올 날짜도 좋아요.")
+                            .font(.caption)
                             .foregroundStyle(AppTheme.secondaryText)
-                        if !dateText.isEmpty && StartDateInput.parse(dateText) == nil {
-                            Text("실제 달력에 있는 날짜를 입력해 주세요.")
-                                .font(.footnote)
-                                .foregroundStyle(.red)
+                    }
+                    .padding(.top, 12)
+
+                    VStack(spacing: 16) {
+                        Picker("선택 방법", selection: $mode) {
+                            ForEach(DateChoiceMode.allCases, id: \.self) { choice in
+                                Text(choice.rawValue).tag(choice)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+
+                        if mode == .calendar {
+                            DatePicker("기준일", selection: $draftDate, displayedComponents: .date)
+                                .datePickerStyle(.graphical)
+                                .labelsHidden()
+                                .accessibilityIdentifier("anniversary-graphical-date-picker")
+                        } else {
+                            VStack(alignment: .leading, spacing: 12) {
+                                TextField("YYYY.MM.DD", text: $dateText)
+                                    .font(.system(.title2, design: .monospaced))
+                                    .keyboardType(.numbersAndPunctuation)
+                                    .submitLabel(.done)
+                                    .focused($isDateTextFocused)
+                                    .onSubmit { isDateTextFocused = false }
+                                    .accessibilityIdentifier("anniversary-direct-date-field")
+                                Divider()
+                                Text("예: 2020.09.24 또는 20200924")
+                                    .font(.caption)
+                                    .foregroundStyle(AppTheme.secondaryText)
+                                if !dateText.isEmpty && StartDateInput.parse(dateText) == nil {
+                                    Label("달력에 있는 날짜를 입력해 주세요.", systemImage: "exclamationmark.circle")
+                                        .font(.caption)
+                                        .foregroundStyle(.red)
+                                }
+                            }
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 4)
                         }
                     }
-                } header: {
-                    Text("날짜 선택")
-                }
+                    .padding(16)
+                    .modifier(PaperSurface())
 
-                Section {
-                    Text("선택한 날짜 · \(selectedDate.map { StartDateInput.format($0) } ?? "확인 필요")")
-                        .font(.subheadline.weight(.medium))
-                        .monospacedDigit()
+                    VStack(alignment: .leading, spacing: 12) {
+                        EditorialEyebrow(title: "빠른 선택")
+                        GlassControlGroup {
+                            HStack(spacing: 10) {
+                                preset("오늘", daysAgo: 0)
+                                preset("어제", daysAgo: 1)
+                                preset("1년 전", yearsAgo: 1)
+                            }
+                            .font(.subheadline.weight(.medium))
+                            .modifier(GlassSecondaryActionStyle())
+                            .buttonBorderShape(.capsule)
+                        }
+                    }
                 }
+                .padding(.horizontal, AppTheme.horizontalPadding)
+                .padding(.bottom, 30)
+                .frame(maxWidth: 520)
+                .frame(maxWidth: .infinity)
             }
-            .scrollContentBackground(.hidden)
-            .background(AppTheme.background)
+            .scrollDismissesKeyboard(.interactively)
+            .background { PaperBackdrop() }
+            .foregroundStyle(AppTheme.ink)
             .navigationTitle("기준일 선택")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -131,7 +154,10 @@ struct StartDateSelectionSheet: View {
             }
             .onChange(of: mode) { _, newValue in
                 if newValue == .direct { isDateTextFocused = true }
-                else { isDateTextFocused = false }
+                else {
+                    if let parsed = StartDateInput.parse(dateText) { draftDate = parsed }
+                    isDateTextFocused = false
+                }
             }
         }
     }
